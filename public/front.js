@@ -1,4 +1,61 @@
 // front.js
+//envoyer une requete de setup
+function setup() {
+  fetch("/setup")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.ok) {
+        console.log("setup reussi");
+      } else {
+        alert("setup failed");
+        console.log("setup failed");
+      }
+    })
+    .catch((error) => {
+      console.error("Error during setup:", error);
+      alert("setup failed");
+    });
+}
+setup();
+
+//envoyer une requete de reset
+function reset() {
+  fetch("/reset")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Reset response:", data);
+      // Afficher un message de succès
+      alert("Reset successful!");
+    })
+    .catch((error) => {
+      console.error("Error during reset:", error);
+      // Afficher un message d'erreur
+      alert("Reset failed. Please check the console for details.");
+    });
+}
+
+//envoyer une requete de query
+function query() {
+  const query = document.getElementById("query").value;
+  fetch("/query", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Query response:", data);
+      // Afficher un message de succès
+      alert("Query successful!");
+    })
+    .catch((error) => {
+      console.error("Error during query:", error);
+      // Afficher un message d'erreur
+      alert("Query failed. Please check the console for details.");
+    });
+}
 // UI logic pour index.html
 (() => {
   // === Pré-sets (copie de tes queries) ===
@@ -30,7 +87,7 @@
     {
       id: "oltp_insert_sample",
       label: "Insert sample client (temp)",
-      sql: "INSERT INTO clients (name,email,age) VALUES ('__SAMPLE__','sample@example.com',42); DELETE FROM clients WHERE email = 'sample@example.com';",
+      sql: "INSERT INTO clients (name,email,age) VALUES ('__SAMPLE__','sample@example.com',42); ",
       type: "oltp",
     },
     {
