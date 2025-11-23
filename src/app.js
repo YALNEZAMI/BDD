@@ -4,7 +4,6 @@ const { checkConnections } = require("./connexion.js");
 const { populateMonet } = require("./populateMonetdb.js");
 const { populatePostgre } = require("./populatePostgre.js");
 const { getResultsArray } = require("./compare");
-const { QUERIES_ARRAY, OLAP_QUERIES, OLTP_QUERIES } = require("./queries.js");
 const { getData } = require("./generateData.js");
 const { insertDefaults, server } = require("./config.js");
 const {
@@ -106,18 +105,6 @@ async function traiter(params) {
   } catch (err) {
     console.error("Erreur :", err);
   }
-}
-
-async function test() {
-  const object = {
-    type: "OLTP",
-    nbrStart: 1,
-    nbrEnd: 10,
-    queries: OLTP_QUERIES,
-    jump: 1,
-  };
-  await firstSetUp();
-  await traiter(object);
 }
 
 module.exports = { firstSetUp, traiter };
