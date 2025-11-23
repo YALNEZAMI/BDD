@@ -41,7 +41,12 @@ const width = 800;
 const height = 600;
 const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
 
-async function createGraphFromCSV(csvFile, outputFileName) {
+/**
+ * @param {string} csvFile - chemin vers le fichier CSV
+ * @param {string} outputFileName - nom du fichier de sortie
+ * @param {string} queryMajorType - "OLTP" ou "OLAP"
+ */
+async function createGraphFromCSV(csvFile, outputFileName, queryMajorType) {
   const content = fs.readFileSync(csvFile);
   const records = parse(content, { columns: true });
 
@@ -74,7 +79,7 @@ async function createGraphFromCSV(csvFile, outputFileName) {
       plugins: {
         title: {
           display: true,
-          text: "Comparaison des performances entre requêtes OLTP/OLAP",
+          text: "Comparaison des performances entre requêtes " + queryMajorType,
           font: { size: 20 },
         },
       },

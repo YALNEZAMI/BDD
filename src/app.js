@@ -90,7 +90,11 @@ async function traiter(params) {
     console.log("creating csv file...");
     const CSV = exportCumulativeGraphData(res, params);
     console.log("creating graphique chart...");
-    const fileName = await createGraphFromCSV(CSV, "result" + ".png");
+    const fileName = await createGraphFromCSV(
+      CSV,
+      "result" + ".png",
+      getMajorType(params.queries)
+    );
     let split = CSV.split("/");
     if (split.length == 1) {
       split = CSV.split("\\");
@@ -105,6 +109,28 @@ async function traiter(params) {
     };
   } catch (err) {
     console.error("Erreur :", err);
+  }
+}
+/**
+ * @param queries
+ * @return string le type majoritaire dans queries => OLTP | OLAP
+ */
+function getMajorType(queries) {
+  let oltp = 0;
+  let olap = 0;
+  for (const q of queries) {
+    if (q.type.toUpperCase() == "OLTP") {
+      oltp++;
+    } else if (q.type.toUpperCase() == "OLAP") {
+      olap++;
+    }
+  }
+  if (oltp > olap) {
+    return "OLTP";
+  } else if (oltp < olap) {
+    return "OLAP";
+  } else {
+    return "OLAP/OLTP";
   }
 }
 
