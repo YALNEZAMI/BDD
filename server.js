@@ -30,7 +30,7 @@ app.get("/", async (req, res) => {
 // Route simple
 app.get("/setup", async (req, res) => {
   const setup = await firstSetUp();
-  res.send({ ok: setup });
+  res.send({ ok: setup, message: "setup réussi" });
 });
 app.post("/traiter", async (req, res) => {
   const result = await traiter(req.body);
