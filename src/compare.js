@@ -176,11 +176,11 @@ async function compareMultipleQueries(queries, nbrExecution = 1) {
 }
 /**
  * Exécute un tableau de requêtes plusieurs fois et retourne un tableau de résultats par exécution
- * @param {Array<{label:string, sql:string, type:string}>} queries
+ * @param {Array<{id:string ,label:string, sql:string, type:string}>} queries
  * @param {number} nbrExecution Nombre de fois à exécuter chaque requête
  * @returns {Array} tableau de { q, pg, monet } pour chaque exécution
  */
-async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 1) {
+async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
   const pool = getConnexion(postgreConf);
   const conn = getConnexion(monetdbConf);
   await pool.connect();
@@ -190,6 +190,8 @@ async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 1) {
 
   for (const q of queries) {
     for (let i = nbrExecutionMin; i < nbrExecution; i++) {
+      console.log("exec q", q.id + " ieme:" + i);
+
       const pgRes = await runQueryPostgre(pool, q.sql);
       const monetRes = await runQueryMonetdb(conn, q.sql);
 
