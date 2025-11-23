@@ -13,14 +13,14 @@ if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
  * @param {string} type - "OLTP" ou "OLAP"
  * @param {number} jump - échantillonnage
  */
-function exportCumulativeGraphData(results, object) {
+function exportCumulativeGraphData(results, params) {
   const csvLines = ["NumExecutedQueries,PostgreSQL,MonetDB"];
-  const jump = object.jump || 1;
+  const jump = params.jump || 1;
   let pgCum = 0;
   let monetCum = 0;
 
   let resultIndex = 0; // index dans results[]
-  for (let count = object.nbrStart; count <= object.nbrEnd; count += jump) {
+  for (let count = params.nbrStart; count <= params.nbrEnd; count += jump) {
     if (resultIndex >= results.length) break;
     const r = results[resultIndex];
     pgCum += r.pg.durationMs;

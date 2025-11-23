@@ -76,19 +76,19 @@ async function firstSetUp() {
  * }
  *
  */
-async function traiter(object) {
+async function traiter(params) {
   try {
     console.log("\n____PERFORMING QUERIES_____");
     console.log("processing queries...");
     const res = await getResultsArray(
-      object.queries,
-      object.nbrStart,
-      object.nbrEnd
+      params.queries,
+      params.nbrStart,
+      params.nbrEnd
     );
     // console.log(res);
 
     console.log("creating csv file...");
-    const CSV = exportCumulativeGraphData(res, object);
+    const CSV = exportCumulativeGraphData(res, params);
     console.log("creating graphique chart...");
     const fileName = await createGraphFromCSV(CSV, "result" + ".png");
     let split = CSV.split("/");
@@ -96,7 +96,6 @@ async function traiter(object) {
       split = CSV.split("\\");
     }
     const csvName = split[split.length - 1];
-    console.log("csvnam", csvName);
 
     return {
       ok: true,
