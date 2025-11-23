@@ -41,7 +41,7 @@ async function runQueryMonetdb(conn, sql) {
  * Exécute un tableau de requêtes plusieurs fois et retourne un tableau de résultats par exécution
  * @param {Array<{id:string ,label:string, sql:string, type:string}>} queries
  * @param {number} nbrExecution Nombre de fois à exécuter chaque requête
- * @returns {Array} tableau de { q, pg, monet } pour chaque exécution
+ * @return {Array<{q: {id:string ,label:string, sql:string, type:string}, pg: {engine:string, durationMs:number}, monet: {engine:string, durationMs:number}}}
  */
 async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
   const pool = getConnexion(postgreConf);

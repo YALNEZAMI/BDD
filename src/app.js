@@ -14,7 +14,7 @@ const {
 /**
  *
  * verification des ports et connections
- * verification des bases de données
+ * verification des bases de données et creation de celle de postgre seulement !!!!
  * creation des tables
  * population des tables
  */
@@ -62,7 +62,7 @@ async function firstSetUp() {
   }
 }
 /**
- * params:{
+ * @param params:{
  * nbrStart: int// à partir de quelle nbr de requetes commencer
  * nbrEnd: int// jusqu'à combien de requetes aller
  * queries: {
@@ -73,6 +73,7 @@ async function firstSetUp() {
  * }[]
  * jump:int //espacement du nombre de requetes
  * }
+ * @return {Array <{ok: boolean, message: string, url: string, csvPath: string}>}
  *
  */
 async function traiter(params) {
