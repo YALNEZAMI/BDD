@@ -13,8 +13,9 @@ function normalizeConnexion(conn, engine) {
       raw: conn,
       connect: () => conn.connect(),
       execute: async (sql) => {
-        await conn.execute(sql);
+        const res = await conn.execute(sql);
         await conn.commit();
+        return res;
       },
       close: async () => await conn.close(),
     };
