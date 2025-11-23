@@ -68,6 +68,33 @@ function normalizeRawResult(raw, engine) {
     raw,
   };
 }
+/**
+ * Normalise les résultats Postgre et MonetDB pour comparaison
+ */
+function normalizeQueryResults(pgResult, monetResult) {
+  return {
+    pg: {
+      engine: "postgre",
+      rowCount: pgResult.rowCount,
+      sizeBytes: pgResult.sizeBytes,
+      durationMs: pgResult.durationMs,
+      // diskBefore: pgResult.diskBefore,
+      // diskAfter: pgResult.diskAfter,
+      // deadRowsBefore: pgResult.deadRowsBefore,
+      // deadRowsAfter: pgResult.deadRowsAfter,
+      // ioBefore: pgResult.ioBefore,
+      // ioAfter: pgResult.ioAfter,
+    },
+    monet: {
+      engine: "monetdb",
+      rowCount: monetResult.rowCount,
+      sizeBytes: monetResult.sizeBytes,
+      durationMs: monetResult.durationMs,
+      // statsBefore: monetResult.statsBefore,
+      // statsAfter: monetResult.statsAfter,
+    },
+  };
+}
 
 function normalizeConnexion(conn, engine) {
   if (engine === "postgre") {
@@ -85,7 +112,12 @@ function normalizeConnexion(conn, engine) {
       connect: () => conn.connect(),
       execute: (sql) => conn.execute(sql),
       close: () => conn.close(),
+      commit: () => conn.commit(),
     };
   }
 }
-module.exports = { normalizeRawResult, normalizeConnexion };
+module.exports = {
+  normalizeQueryResults,
+  normalizeConnexion,
+  normalizeRawResult,
+};

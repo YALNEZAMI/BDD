@@ -1,0 +1,9 @@
+OLTP :
+
+PostgreSQL descend rapidement avec le nombre de requêtes → row-store + cache + MVCC + HOT updates.
+
+MonetDB reste quasi-constant → column-store pas optimisé pour les petites mises à jour.
+
+OLAP :
+
+MonetDB surpasse PostgreSQL pour les scans/agrégations → les colonnes contiguës et le traitement vectoriel font la différence.

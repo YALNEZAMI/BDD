@@ -1,5 +1,13 @@
 // config.js
+const N = 1000;
 module.exports = {
+  server: {
+    port: 3000,
+    host: "localhost",
+    protocol: "http",
+    url: "localhost:3000",
+    local_url: "http://localhost:3000",
+  },
   postgreConf: {
     sgbd: "postgre",
     user: "postgres",
@@ -19,8 +27,8 @@ module.exports = {
   },
 
   insertDefaults: {
-    nClients: 2000,
-    nOrders: 2000,
-    batchSize: 200,
+    nClients: N,
+    nOrders: N,
+    batchSize: N / 5,
   },
 };
