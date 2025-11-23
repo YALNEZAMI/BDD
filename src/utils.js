@@ -12,9 +12,11 @@ function normalizeConnexion(conn, engine) {
       type: "monetdb",
       raw: conn,
       connect: () => conn.connect(),
-      execute: (sql) => conn.execute(sql),
-      close: () => conn.close(),
-      commit: () => conn.commit(),
+      execute: async (sql) => {
+        await conn.execute(sql);
+        await conn.commit();
+      },
+      close: async () => await conn.close(),
     };
   }
 }

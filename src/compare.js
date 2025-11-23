@@ -79,7 +79,6 @@ async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
   }
 
   await pool.close();
-  await conn.commit();
   await conn.close();
 
   return results;

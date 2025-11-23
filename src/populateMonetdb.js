@@ -87,7 +87,6 @@ async function populateMonet(
     await fillClientsMonet(conn, clients, batchSize);
     await fillOrdersMonet(conn, orders, batchSize);
   } finally {
-    await conn.commit();
     await conn.close();
   }
 
