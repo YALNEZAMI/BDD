@@ -78,6 +78,9 @@
   const clearSelectionBtn = document.getElementById("clearSelection");
   const fillAllOLTP = document.getElementById("fillAllOLTP");
   const fillAllOLAP = document.getElementById("fillAllOLAP");
+  const onlyOLTP = document.getElementById("onlyOLTP");
+  const onlyOLAP = document.getElementById("onlyOLAP");
+
   const loaderEl = document.getElementById("loader");
   const type_requete_courrant = document.getElementById(
     "type_requete_courrant"
@@ -92,7 +95,7 @@
   }
 
   // === State ===
-  const selected = []; // array of query objects
+  let selected = []; // array of query objects
 
   // Helper: render a preset card
   function makeCard(q) {
@@ -183,16 +186,13 @@
         countOLAP++;
       }
     });
-    type_requete_courrant.innerHTML = `${
-      countOLTP > 0 ? countOLTP + " : OLTP " : ""
+    type_requete_courrant.innerHTML = `Aperçu pour: ${
+      countOLTP > 0 ? countOLTP + " OLTP " : ""
     } ${countOLTP > 0 && countOLAP > 0 ? "," : ""} ${
-      countOLAP > 0 ? countOLAP + " : OLAP " : ""
-    } , ${
+      countOLAP > 0 ? countOLAP + " OLAP " : ""
+    }   <br />${
       selected.length > 0
-        ? "Total queries: " +
-          selected.length *
-            ((Number(nbrEndEl.value) - Number(nbrStartEl.value)) /
-              Number(jumpEl.value))
+        ? "Total queries: " + selected.length * Number(nbrEndEl.value)
         : ""
     }`;
   }
@@ -235,6 +235,16 @@
     });
     renderSelected();
   });
+
+  onlyOLAP.addEventListener("click", () => {
+    selected = selected.filter((q) => q.type === "olap");
+    renderSelected();
+  });
+  onlyOLTP.addEventListener("click", () => {
+    selected = selected.filter((q) => q.type === "oltp");
+    renderSelected();
+  });
+
   //s'assurer de la conformité des nombres
   nbrStartEl.addEventListener("input", () => {
     nbrEndEl.min = Number(nbrStartEl.value) + 2;
@@ -256,6 +266,10 @@
       alert("Sélectionne au moins une requête.");
       return;
     }
+    //hide previous result
+    resultImage.src = "";
+    resultImage.classList.add("hidden");
+    csvLinkContainer.classList.add("hidden");
 
     const nbrStart = Number(nbrStartEl.value) || 1;
     const jump = Number(jumpEl.value) || 1;

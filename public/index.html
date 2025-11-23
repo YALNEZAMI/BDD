@@ -98,6 +98,18 @@
           >
             Ajouter tous OLAP
           </button>
+          <button
+            id="onlyOLTP"
+            class="bg-slate-600 text-white px-3 py-1 rounded hover:bg-slate-700"
+          >
+            Only OLTP
+          </button>
+          <button
+            id="onlyOLAP"
+            class="bg-slate-600 text-white px-3 py-1 rounded hover:bg-slate-700"
+          >
+            Only OLAP
+          </button>
         </div>
       </section>
 
@@ -172,9 +184,12 @@
         </div>
 
         <div id="preview" class="space-y-2">
-          <div class="flex gap-2 underlined">
-            <h3 class="font-medium">Aperçu pour</h3>
-            <p id="type_requete_courrant">0 OLTP, 0 OLAP, Total requêtes 0</p>
+          <div class="flex gap-2">
+            <p id="type_requete_courrant" class="font-bold">
+              Aperçu pour: 0 OLTP, 0 OLAP
+              <br />
+              Total requêtes 0
+            </p>
           </div>
           <img
             id="resultImage"
