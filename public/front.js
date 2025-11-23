@@ -135,7 +135,7 @@
 
   function select(q) {
     selected.push(q);
-    setCurrentType();
+    setCurrentParameteres();
   }
 
   function renderSelected() {
@@ -167,13 +167,13 @@
       btn.addEventListener("click", (e) => {
         const i = Number(btn.dataset.idx);
         selected.splice(i, 1);
-        setCurrentType();
+        setCurrentParameteres();
         renderSelected();
       });
     });
   }
   //set current type
-  function setCurrentType() {
+  function setCurrentParameteres() {
     let countOLTP = 0;
     let countOLAP = 0;
     selected.forEach((q) => {
@@ -187,6 +187,13 @@
       countOLTP > 0 ? countOLTP + " : OLTP " : ""
     } ${countOLTP > 0 && countOLAP > 0 ? "," : ""} ${
       countOLAP > 0 ? countOLAP + " : OLAP " : ""
+    } , ${
+      selected.length > 0
+        ? "Total queries: " +
+          selected.length *
+            ((Number(nbrEndEl.value) - Number(nbrStartEl.value)) /
+              Number(jumpEl.value))
+        : ""
     }`;
   }
   // add custom query
@@ -229,16 +236,19 @@
     renderSelected();
   });
   //s'assurer de la conformité des nombres
-  nbrStartEl.addEventListener("change", () => {
+  nbrStartEl.addEventListener("input", () => {
     nbrEndEl.min = Number(nbrStartEl.value) + 2;
     jumpEl.max = Number(nbrEndEl.value) - Number(nbrStartEl.value) - 1;
+    setCurrentParameteres();
   });
-  nbrEndEl.addEventListener("change", () => {
+  nbrEndEl.addEventListener("input", () => {
     nbrStartEl.max = Number(nbrEndEl.value) - 2;
     jumpEl.max = Number(nbrEndEl.value) - Number(nbrStartEl.value) - 1;
+    setCurrentParameteres();
   });
-  jumpEl.addEventListener("change", () => {
+  jumpEl.addEventListener("input", () => {
     jumpEl.max = Number(nbrEndEl.value) - Number(nbrStartEl.value);
+    setCurrentParameteres();
   });
   // run handler
   runBtn.addEventListener("click", async () => {

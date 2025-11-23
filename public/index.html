@@ -112,7 +112,7 @@
           id="nbrStart"
           type="number"
           class="w-full border rounded p-2 mb-2"
-          value="1"
+          value="150"
           min="1"
         />
 
@@ -123,16 +123,18 @@
           id="nbrEnd"
           type="number"
           class="w-full border rounded p-2 mb-2"
-          value="150"
+          value="300"
           min="3"
         />
 
-        <label class="block text-sm font-medium">Jump (échantillonnage)</label>
+        <label class="block text-sm font-medium"
+          >Espacement (échantillonnage)</label
+        >
         <input
           id="jump"
           type="number"
           class="w-full border rounded p-2 mb-4"
-          value="1"
+          value="2"
           min="1"
         />
 
@@ -170,9 +172,9 @@
         </div>
 
         <div id="preview" class="space-y-2">
-          <div class="flex gap-2">
+          <div class="flex gap-2 underlined">
             <h3 class="font-medium">Aperçu pour</h3>
-            <p id="type_requete_courrant">0 OLTP, 0 OLAP</p>
+            <p id="type_requete_courrant">0 OLTP, 0 OLAP, Total requêtes 0</p>
           </div>
           <img
             id="resultImage"
