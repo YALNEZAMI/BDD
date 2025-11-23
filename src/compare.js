@@ -53,29 +53,15 @@ async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
   const results = [];
 
   for (const q of queries) {
-    const executions = [];
-
     for (let i = nbrExecutionMin; i < nbrExecution; i++) {
-      // Exécution parallèle PostgreSQL + MonetDB
-      executions.push(
-        (async () => {
-          const [pgRes, monetRes] = await Promise.all([
-            runQueryPostgre(pool, q.sql),
-            runQueryMonetdb(conn, q.sql),
-          ]);
+      // Parallélisme inter-SGBD seulement
+      const [pgRes, monetRes] = await Promise.all([
+        runQueryPostgre(pool, q.sql), // 1 seule requête PG à la fois
+        runQueryMonetdb(conn, q.sql), // peut s'exécuter en parallèle
+      ]);
 
-          return {
-            q,
-            pg: pgRes,
-            monet: monetRes,
-          };
-        })()
-      );
+      results.push({ q, pg: pgRes, monet: monetRes });
     }
-
-    // Attendre toutes les exécutions pour cette requête
-    const res = await Promise.all(executions);
-    results.push(...res);
   }
 
   await pool.close();
