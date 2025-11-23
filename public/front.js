@@ -18,44 +18,78 @@ function setup() {
 }
 setup();
 
-//envoyer une requete de reset
-function reset() {
-  fetch("/reset")
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Reset response:", data);
-      // Afficher un message de succès
-      alert("Reset successful!");
-    })
-    .catch((error) => {
-      console.error("Error during reset:", error);
-      // Afficher un message d'erreur
-      alert("Reset failed. Please check the console for details.");
-    });
+function isSingleSQLQuery(sql) {
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+  let inLineComment = false;
+  let inBlockComment = false;
+
+  let semicolonCount = 0;
+
+  for (let i = 0; i < sql.length; i++) {
+    const c = sql[i];
+    const next = sql[i + 1];
+
+    // Manage exiting comments
+    if (inLineComment) {
+      if (c === "\n") inLineComment = false;
+      continue;
+    }
+
+    if (inBlockComment) {
+      if (c === "*" && next === "/") {
+        inBlockComment = false;
+        i++;
+      }
+      continue;
+    }
+
+    // Detect entering comments
+    if (!inSingleQuote && !inDoubleQuote) {
+      if (c === "-" && next === "-") {
+        inLineComment = true;
+        i++;
+        continue;
+      }
+      if (c === "/" && next === "*") {
+        inBlockComment = true;
+        i++;
+        continue;
+      }
+    }
+
+    // Manage string quotes
+    if (!inDoubleQuote && c === "'" && sql[i - 1] !== "\\") {
+      inSingleQuote = !inSingleQuote;
+      continue;
+    }
+    if (!inSingleQuote && c === '"' && sql[i - 1] !== "\\") {
+      inDoubleQuote = !inDoubleQuote;
+      continue;
+    }
+
+    // Count semicolons only when not in quotes/comments
+    if (!inSingleQuote && !inDoubleQuote && c === ";") {
+      semicolonCount++;
+    }
+  }
+
+  // Strip whitespace to check if the query is empty
+  const trimmed = sql.trim();
+  if (!trimmed) return false;
+
+  // Valid only if 0 or 1 semicolon at the END
+  if (semicolonCount === 0) return true;
+
+  if (semicolonCount === 1) {
+    // Only acceptable if last non-space character is ;
+    const lastChar = trimmed[trimmed.length - 1];
+    return lastChar === ";";
+  }
+
+  return false;
 }
 
-//envoyer une requete de query
-function query() {
-  const query = document.getElementById("query").value;
-  fetch("/query", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Query response:", data);
-      // Afficher un message de succès
-      alert("Query successful!");
-    })
-    .catch((error) => {
-      console.error("Error during query:", error);
-      // Afficher un message d'erreur
-      alert("Query failed. Please check the console for details.");
-    });
-}
 // UI logic pour index.html
 (() => {
   // === Pré-sets (copie de tes queries) ===
@@ -257,6 +291,10 @@ function query() {
   addCustomBtn.addEventListener("click", (ev) => {
     const label = customLabel.value.trim();
     const sql = customSql.value.trim();
+    if (!isSingleSQLQuery(sql)) {
+      alert("La requête SQL doit être une seule instruction.");
+      return;
+    }
     const type =
       document.querySelector('input[name="customType"]:checked')?.value ||
       "oltp";
