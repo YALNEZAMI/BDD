@@ -190,8 +190,6 @@ async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
 
   for (const q of queries) {
     for (let i = nbrExecutionMin; i < nbrExecution; i++) {
-      console.log("exec q", q.id + " ieme:" + i);
-
       const pgRes = await runQueryPostgre(pool, q.sql);
       const monetRes = await runQueryMonetdb(conn, q.sql);
 
