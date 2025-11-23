@@ -56,8 +56,10 @@ async function firstSetUp() {
     } else {
       console.error("Error: " + populateMonetResult.message);
     }
+    return true;
   } catch (err) {
     console.error("Erreur :", err);
+    return false;
   }
 }
 /**
@@ -78,13 +80,15 @@ async function traiter(object) {
   try {
     console.log("\n____PERFORMING QUERIES_____");
     console.log("processing queries...");
-    const oltpRes = await getResultsArray(
+    const res = await getResultsArray(
       object.queries,
       object.nbrStart,
       object.nbrEnd
     );
+    // console.log(res);
+
     console.log("creating csv file...");
-    const CSV = exportCumulativeGraphData(oltpRes, object);
+    const CSV = exportCumulativeGraphData(res, object);
     console.log("creating graphique chart...");
     const fileName = await createGraphFromCSV(CSV, "result" + ".png");
     let split = CSV.split("/");
