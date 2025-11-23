@@ -28,8 +28,9 @@ app.get("/", async (req, res) => {
 });
 
 // Route simple
-app.post("/setup", async (req, res) => {
-  await firstSetUp();
+app.get("/setup", async (req, res) => {
+  const setup = await firstSetUp();
+  res.send({ ok: setup });
 });
 app.post("/traiter", async (req, res) => {
   const result = await traiter(req.body);
