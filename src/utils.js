@@ -4,8 +4,8 @@ function normalizeConnexion(conn, engine) {
       type: "postgre",
       raw: conn,
       connect: async () => {}, // Pool se connecte automatiquement
-      execute: (sql, params) => conn.query(sql, params),
-      close: () => conn.end(),
+      execute: async (sql, params) => await conn.query(sql, params),
+      close: async () => await conn.end(),
     };
   } else if (engine === "monetdb") {
     return {
