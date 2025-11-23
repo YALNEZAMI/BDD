@@ -5,7 +5,7 @@ const path = require("path");
 const { parse } = require("csv-parse/sync");
 
 // === public A LA RACINE DU PROJET ===
-const PUBLIC_DIR = path.join(__dirname, "..", "public");
+const PUBLIC_DIR = path.join(__dirname, "..", "public/bin");
 if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
 
 /**

@@ -97,8 +97,8 @@ async function traiter(object) {
     return {
       ok: true,
       message: " Traitement terminé",
-      url: server.local_url + "/" + fileName,
-      csvPath: server.local_url + "/" + csvName,
+      url: server.local_url + "/bin/" + fileName,
+      csvPath: server.local_url + "/bin/" + csvName,
     };
   } catch (err) {
     console.error("Erreur :", err);
