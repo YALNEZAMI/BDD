@@ -48,6 +48,11 @@ async function checkConnections() {
   return bothConnected;
 }
 
+/**
+ *
+ * @param {*} conf une configuration de driver venant de config.js
+ * @returns retourne un driver (monetdb | postgre)
+ */
 function getConnexion(conf) {
   if (conf.sgbd === "postgre") {
     const pool = new Pool(conf);
@@ -68,9 +73,13 @@ function getConnexion(conf) {
   }
 }
 
+/**
+ *
+ * @param {*} conn un dirver resultant de getConnexion
+ * @param {string} engine nom du driver postgre | monetdb
+ * @returns une forme unifié du driver initial
+ */
 function normalizeConnexion(conn, engine) {
-  console.log("engine", engine);
-
   if (engine === "postgre") {
     return {
       type: "postgre",

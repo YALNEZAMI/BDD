@@ -106,7 +106,7 @@ async function fillOrdersPostgres(pool, orders = [], batchSize = 200) {
 }
 
 /**
- * Main function
+ * Main function: population des clients et orders
  */
 async function populatePostgre(
   clients = [],

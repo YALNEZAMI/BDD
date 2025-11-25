@@ -1,5 +1,10 @@
 const { faker } = require("@faker-js/faker");
 
+/**
+ *
+ * @param {*} nbr  de client à generer à modifier dans config.js
+ * @returns tableau de clients générés aléatoirement
+ */
 function generateClients(nbr) {
   const clients = [];
   for (let i = 0; i < nbr; i++) {
@@ -11,7 +16,12 @@ function generateClients(nbr) {
   }
   return clients;
 }
-
+/**
+ *
+ * @param {*} nbr de commande à modifier dans config.js
+ * @param {*} clients les clients auxquels les commandes sont associées
+ * @returns  tableau des commandes généré aléatoirement
+ */
 function generateOrders(nbr, clients) {
   const orders = [];
   for (let i = 0; i < nbr; i++) {
@@ -30,6 +40,12 @@ function generateAmount(max = 100) {
   return Math.floor(raw * 100) / 100;
 }
 
+/**
+ *
+ * @param {*} nbrClients
+ * @param {*} nbrOrders
+ * @returns un object {clients: tableau de clients générés, orders: tableau de commandes générés}
+ */
 function getData(nbrClients, nbrOrders) {
   const clients = generateClients(nbrClients);
   const orders = generateOrders(nbrOrders, clients);

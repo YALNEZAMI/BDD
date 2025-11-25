@@ -3,6 +3,7 @@ const { getConnexion } = require("./connexion");
 const conf = require("./config").monetdbConf;
 
 /**
+ * @param conn driver resultat de getConnexion() dans connexion.js
  * Create tables in MonetDB
  */
 async function createTablesMonet(conn) {
@@ -74,26 +75,20 @@ async function fillOrdersMonet(conn, orders = [], batchSize = 200) {
 }
 
 /**
- * Main function
+ * Main function: population des client et orders
  */
 async function populateMonet(
   clients,
   orders,
   batchSize = insertDefaults.batchSize
 ) {
-  console.log(11);
-
   const conn = getConnexion(conf);
-  console.log(22);
 
   await conn.connect();
-  console.log(33);
 
   await createTablesMonet(conn);
-  console.log(44);
 
   await fillClientsMonet(conn, clients, batchSize);
-  console.log(55);
 
   await fillOrdersMonet(conn, orders, batchSize);
   await conn.close();
