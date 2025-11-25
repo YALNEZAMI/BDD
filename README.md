@@ -1,3 +1,7 @@
+# Function
+
+Comparaison entre les performance des deux SGBDs MonetDB et PostgreSQL en fonction du type de requêtes (OLTP/OLAP).
+
 # Prerequis:
 
 avoir nodejs et npm d'installé
