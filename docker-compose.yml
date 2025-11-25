@@ -1,0 +1,143 @@
+# docker-compose.yml (versioned) + README
+# This file contains a production-minded docker-compose setup for two services:
+#  - Postgres (PostgreSQL 15)
+#  - MonetDB (latest official image)
+# It uses a mix of .env (for non-sensitive defaults) and Docker secrets for sensitive
+# MonetDB admin password. Adjust to your environment and security policies.
+
+# ---------------------------
+# docker-compose.yml
+# ---------------------------
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres15
+    restart: unless-stopped
+    env_file: .env                       # create a .env next to this compose file (see README)
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root    # read from .env; keep .env out of version control
+      POSTGRES_DB: demo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d demo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  monetdb:
+    image: monetdb/monetdb:latest
+    container_name: monetdb
+    restart: unless-stopped
+    ports:
+      - "50000:50000"
+    volumes:
+      - monetdb_data:/var/monetdb5
+    environment:
+      MDB_DAEMONPASS: monetdb   # daemon passphrase (change in production)
+      MDB_SHOW_VARS: "1"
+      # Do NOT put MDB_DB_ADMIN_PASS directly here in plaintext. Instead the image supports
+      # MDB_DB_ADMIN_PASS_FILE which points to a path in the container where Docker places the secret.
+      MDB_DB_ADMIN_PASS_FILE: /run/secrets/monetdb_admin_pass
+      # Optionally auto-create a DB named 'demo' on first run; set to empty string '' to disable.
+      MDB_CREATE_DBS: demo
+    entrypoint: >
+      sh -c "
+        # create farm if missing
+        if [ ! -d /var/monetdb5/dbfarm ]; then
+          echo 'Initializing MonetDB farm...';
+          monetdbd create /var/monetdb5;
+        fi &&
+        monetdbd start /var/monetdb5 &&
+        # The official image will use MDB_CREATE_DBS + the admin pass file to create DBs.
+        # We attempt to release the demo DB if present; ignore errors so the container stays up.
+        monetdb release demo || true &&
+        tail -f /dev/null
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "mclient -u monetdb -P $(cat /run/secrets/monetdb_admin_pass) -d demo -e '\\q' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    secrets:
+      - monetdb_admin_pass
+
+volumes:
+  postgres_data:
+  monetdb_data:
+
+secrets:
+  monetdb_admin_pass:
+    file: ./secrets/monetdb_admin_pass.txt
+
+networks:
+  default:
+    name: demo_network
+
+# ---------------------------
+# README / Usage notes
+# ---------------------------
+# 1) Files to create locally (keep secrets out of git):
+#    - .env               (contains POSTGRES_PASSWORD and optional POSTGRES_USER/POSTGRES_DB)
+#    - ./secrets/monetdb_admin_pass.txt   (contains the MonetDB admin password, single line)
+#
+# Example .env (DO NOT COMMIT):
+# POSTGRES_USER=postgres
+# POSTGRES_PASSWORD=verysecretpostgrespassword
+# POSTGRES_DB=demo
+# MDB_DAEMONPASS=monetdbdaemonpass
+# MDB_CREATE_DBS=demo
+#
+# Create the secrets directory and file with restricted permissions:
+# mkdir -p ./secrets
+# printf "monetdb-admin-pass\n" > ./secrets/monetdb_admin_pass.txt
+# chmod 600 ./secrets/monetdb_admin_pass.txt
+#
+# 2) Start the stack:
+#    docker compose up -d
+#
+# 3) Verify logs while the containers initialize:
+#    docker compose logs -f monetdb
+#    docker compose logs -f postgres
+#
+# 4) Connect to Postgres from host (psql must be installed) or from another container:
+#    psql "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
+#
+# 5) Connect to MonetDB using mclient (from host or from inside the container):
+#    # from host (if mclient installed locally):
+#    mclient -h localhost -p 50000 -u monetdb -P $(cat ./secrets/monetdb_admin_pass.txt) -d demo
+#
+#    # from inside the container:
+#    docker exec -it monetdb mclient -u monetdb -d demo
+#
+# 6) Notes about MDB_CREATE_DBS and MDB_DB_ADMIN_PASS_FILE:
+#    - The official monetdb image expects an admin password to be provided either via
+#      MDB_DB_ADMIN_PASS or MDB_DB_ADMIN_PASS_FILE. The compose above uses the FILE form
+#      and the secret is mounted to /run/secrets/monetdb_admin_pass for the container.
+#    - If MDB_CREATE_DBS is set (space separated list), the entrypoint will attempt to create
+#      those DBs on first run. If you prefer manual control, set MDB_CREATE_DBS to an empty string
+#      in your .env: MDB_CREATE_DBS=''
+#
+# 7) Healthchecks:
+#    - The Postgres healthcheck uses pg_isready. It requires the pg tools be available in container (they are in the official image).
+#    - The MonetDB healthcheck runs mclient using the secret file. Adjust or remove if it causes issues in your environment.
+#
+# 8) Making it more production-ready (recommendations):
+#    - Use Docker Swarm or Kubernetes secrets for better secret management in production.
+#    - Replace tail -f /dev/null hack with a proper foreground command if you migrate to a real orchestrator.
+#    - Use a non-default MDB_DAEMONPASS and tune MonetDB settings via MDB_STARTUP_FLAGS or mounting a custom configuration file.
+#    - Add backups: schedule pg_dump for Postgres and use monetdb backup facilities for MonetDB.
+#
+# 9) Troubleshooting quick tips:
+#    - If the MonetDB logs show: "Please use MDB_DB_ADMIN_PASS or MDB_DB_ADMIN_PASS_FILE":
+#        * Ensure ./secrets/monetdb_admin_pass.txt exists and is readable, then recreate the stack.
+#        * After changing the secret file, you may need to recreate the service so Docker updates the secret: docker compose up -d --force-recreate monetdb
+#    - If MonetDB won't create the demo DB automatically, check MDB_CREATE_DBS in your .env and inspect logs.
+#
+# ---------------------------
+# End of file
+# ---------------------------
