@@ -2,7 +2,6 @@ const net = require("net");
 const { postgreConf, monetdbConf } = require("./config.js");
 const { Connection } = require("monetdb"); // Version 2.x
 const { Pool } = require("pg");
-const { normalizeConnexion } = require("./utils.js");
 // Vérifie si un port est ouvert
 function checkPort(host, port, timeout = 1000) {
   return new Promise((resolve) => {
@@ -63,7 +62,35 @@ function getConnexion(conf) {
       password: monetdbConf.password,
       database: monetdbConf.database,
     });
+    console.log(conn);
+
     return normalizeConnexion(conn, conf.sgbd);
+  }
+}
+
+function normalizeConnexion(conn, engine) {
+  console.log("engine", engine);
+
+  if (engine === "postgre") {
+    return {
+      type: "postgre",
+      raw: conn,
+      connect: async () => {}, // Pool se connecte automatiquement
+      execute: async (sql, params) => await conn.query(sql, params),
+      close: async () => await conn.end(),
+    };
+  } else if (engine === "monetdb") {
+    return {
+      type: "monetdb",
+      raw: conn,
+      connect: () => conn.connect(),
+      execute: async (sql) => {
+        const res = await conn.execute(sql);
+        await conn.commit();
+        return res;
+      },
+      close: async () => await conn.close(),
+    };
   }
 }
 
