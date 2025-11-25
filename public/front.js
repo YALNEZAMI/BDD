@@ -468,7 +468,7 @@ async function runRemarkableValues(type) {
       ? PRESET_QUERIES.find((q) => q.id == "oltp_heavy_update")
       : PRESET_QUERIES.find((q) => q.id == "olap_client_order_summary");
   nbrStartEl.value = 400;
-  nbrEndEl.value = 1500;
+  nbrEndEl.value = type.toUpperCase() == "OLTP" ? 1500 : 600;
   jumpEl.value = 2;
   selected = [query];
   renderSelected();
