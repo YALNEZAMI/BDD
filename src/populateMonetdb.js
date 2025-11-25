@@ -6,6 +6,8 @@ const conf = require("./config").monetdbConf;
  * Create tables in MonetDB
  */
 async function createTablesMonet(conn) {
+  console.log("before monet tables creation");
+
   await conn.execute(`
     DROP TABLE IF EXISTS orders;
     DROP TABLE IF EXISTS clients;
@@ -79,16 +81,22 @@ async function populateMonet(
   orders,
   batchSize = insertDefaults.batchSize
 ) {
-  const conn = getConnexion(conf);
+  console.log(11);
 
-  try {
-    await conn.connect();
-    await createTablesMonet(conn);
-    await fillClientsMonet(conn, clients, batchSize);
-    await fillOrdersMonet(conn, orders, batchSize);
-  } finally {
-    await conn.close();
-  }
+  const conn = getConnexion(conf);
+  console.log(22);
+
+  await conn.connect();
+  console.log(33);
+
+  await createTablesMonet(conn);
+  console.log(44);
+
+  await fillClientsMonet(conn, clients, batchSize);
+  console.log(55);
+
+  await fillOrdersMonet(conn, orders, batchSize);
+  await conn.close();
 
   return {
     ok: true,
