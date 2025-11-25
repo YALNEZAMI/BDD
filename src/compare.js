@@ -45,10 +45,14 @@ async function runQueryMonetdb(conn, sql) {
  */
 async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
   const pool = getConnexion(postgreConf);
+  console.log(1);
+
   const conn = getConnexion(monetdbConf);
+  console.log(2);
 
   await pool.connect();
   await conn.connect();
+  console.log(3);
 
   const results = [];
 
