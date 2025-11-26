@@ -27,14 +27,15 @@ faire un test en cliquant sur une des deux options de "Traitement pertinants ""
 
 # en developpement(ne marche pas pour le moment)
 
-docker des servers sgbd:
-docker compose up -d
-
 docker du benchmark:
 se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
-"docker build -t benchmark .""
-puis
-"docker run -p 3000:3000 benchmark"
+"
+docker build -t benchmark-image .
+docker run --name benchmark-container -p 3000:3000 benchmark-image
+"
 
 verifier leur lancement en lançant : docker ps
-vous devez voir
+vous devez voir benchmark dans la list
+
+pour arreter le container:
+docker stop benchmark-container

@@ -51,10 +51,10 @@ export const firstSetUp = async () => {
     } else {
       console.error("Error: " + populateMonetResult.message);
     }
-    return true;
+    return { ok: true, message: "setup réussi" };
   } catch (err) {
     console.error("Erreur :", err);
-    return false;
+    return { ok: false, message: err };
   }
 };
 /**

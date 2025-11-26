@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { firstSetUp, traiter } from "./app.js";
+import "dotenv/config"; // ceci charge automatiquement le .env
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.get("/setup", async (req, res) => {
   console.log("setup route");
 
   const setup = await firstSetUp();
-  res.send({ ok: setup, message: "setup réussi" });
+  res.send(setup);
 });
 app.post("/traiter", async (req, res) => {
   const result = await traiter(req.body);

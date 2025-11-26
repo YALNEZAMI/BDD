@@ -4,8 +4,6 @@ function setup() {
   fetch("/setup")
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
-
       if (data.ok) {
         console.log("setup reussi");
       } else {
@@ -15,7 +13,7 @@ function setup() {
     })
     .catch((error) => {
       console.error("Error during setup:", error);
-      alert("setup failed");
+      // alert("setup failed");
     });
 }
 setup();

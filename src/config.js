@@ -1,5 +1,7 @@
 // config.js
 const N = 1000;
+const SGBD_SERVICES_DOCKERIZED = false;
+const APP_DOCKERIZED = true;
 export const config = {
   server: {
     port: 3000,
@@ -11,7 +13,11 @@ export const config = {
   postgreConf: {
     sgbd: "postgres",
     user: "postgres",
-    host: "localhost",
+    host: SGBD_SERVICES_DOCKERIZED
+      ? "postgres"
+      : APP_DOCKERIZED
+      ? "host.docker.internal"
+      : "localhost",
     database: "demo", // postgresql db name (only lowercase names)
     password: "root",
     port: 5432,
@@ -20,7 +26,11 @@ export const config = {
   monetdbConf: {
     sgbd: "monetdb",
     user: "monetdb",
-    host: "localhost",
+    host: SGBD_SERVICES_DOCKERIZED
+      ? "monetdb"
+      : APP_DOCKERIZED
+      ? "host.docker.internal"
+      : "localhost",
     database: "demo", //already existing monetdb db name, demo by default (only lowercase names)
     password: "monetdb",
     port: 50000,
