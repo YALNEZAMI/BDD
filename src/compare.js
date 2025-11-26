@@ -1,6 +1,5 @@
-const { postgreConf, monetdbConf } = require("./config");
-const { getConnexion } = require("./connexion");
-
+import { config } from "./config.js";
+import { getConnexion } from "./connexion.js";
 /**
  * Exécute une requête sur PostgreSQL et retourne métriques enrichies.
  */
@@ -43,10 +42,14 @@ async function runQueryMonetdb(conn, sql) {
  * @param {number} nbrExecution Nombre de fois à exécuter chaque requête
  * @return {Array<{q: {id:string ,label:string, sql:string, type:string}, pg: {engine:string, durationMs:number}, monet: {engine:string, durationMs:number}}}
  */
-async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
-  const pool = getConnexion(postgreConf);
+export const getResultsArray = async (
+  queries,
+  nbrExecutionMin = 0,
+  nbrExecution = 2
+) => {
+  const pool = getConnexion(config.postgreConf);
 
-  const conn = getConnexion(monetdbConf);
+  const conn = getConnexion(config.monetdbConf);
 
   await pool.connect();
   await conn.connect();
@@ -69,10 +72,4 @@ async function getResultsArray(queries, nbrExecutionMin = 0, nbrExecution = 2) {
   await conn.close();
 
   return results;
-}
-
-module.exports = {
-  getResultsArray,
-  runQueryPostgre,
-  runQueryMonetdb,
 };

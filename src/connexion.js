@@ -1,7 +1,7 @@
-const net = require("net");
-const { postgreConf, monetdbConf } = require("./config.js");
-const { Connection } = require("monetdb"); // Version 2.x
-const { Pool } = require("pg");
+import { config } from "./config.js";
+import { Connection } from "monetdb"; // Version 2.x
+import { Pool } from "pg";
+import net from "net";
 // Vérifie si un port est ouvert
 function checkPort(host, port, timeout = 1000) {
   return new Promise((resolve) => {
@@ -32,8 +32,8 @@ function checkPort(host, port, timeout = 1000) {
 }
 
 // Vérifie si les services écoutent
-async function checkConnections() {
-  const targets = [postgreConf, monetdbConf];
+export const checkConnections = async () => {
+  const targets = [config.postgreConf, config.monetdbConf];
   let bothConnected = true;
   for (const t of targets) {
     const r = await checkPort(t.host, t.port, 800);
@@ -46,14 +46,14 @@ async function checkConnections() {
   }
 
   return bothConnected;
-}
+};
 
 /**
  *
  * @param {*} conf une configuration de driver venant de config.js
  * @returns retourne un driver (monetdb | postgre)
  */
-function getConnexion(conf) {
+export const getConnexion = (conf) => {
   if (conf.sgbd === "postgre") {
     const pool = new Pool(conf);
     return normalizeConnexion(pool, conf.sgbd);
@@ -71,7 +71,7 @@ function getConnexion(conf) {
 
     return normalizeConnexion(conn, conf.sgbd);
   }
-}
+};
 
 /**
  *
@@ -102,5 +102,3 @@ function normalizeConnexion(conn, engine) {
     };
   }
 }
-
-module.exports = { checkConnections, getConnexion };

@@ -1,14 +1,18 @@
-const express = require("express");
-const path = require("path");
-const { firstSetUp, traiter } = require("./src/app");
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import { firstSetUp, traiter } from "./app.js";
 
 const app = express();
 
 // (optionnel) pour parser JSON dans les requêtes POST
 app.use(express.json());
 // public at project root (sibling of src)
-const PUBLIC_DIR = path.join(__dirname, "public");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+const PUBLIC_DIR = path.join(__dirname, "..", "public", "bin");
+console.log(PUBLIC_DIR);
 // Tell express to serve static files from PUBLIC_DIR at web root "/"
 app.use(express.static(PUBLIC_DIR));
 
@@ -23,7 +27,6 @@ app.get("/__public_files__", (req, res) => {
 });
 // Route simple
 app.get("/", async (req, res) => {
-  await firstSetUp();
   res.sendFile(path.join(__dirname, "index.html"));
 });
 

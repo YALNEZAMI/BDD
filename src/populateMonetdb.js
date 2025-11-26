@@ -1,6 +1,5 @@
-const { insertDefaults } = require("./config");
-const { getConnexion } = require("./connexion");
-const conf = require("./config").monetdbConf;
+import { config } from "./config.js";
+import { getConnexion } from "./connexion.js";
 
 /**
  * @param conn driver resultat de getConnexion() dans connexion.js
@@ -77,11 +76,11 @@ async function fillOrdersMonet(conn, orders = [], batchSize = 200) {
 /**
  * Main function: population des client et orders
  */
-async function populateMonet(
+export const populateMonet = async (
   clients,
   orders,
-  batchSize = insertDefaults.batchSize
-) {
+  batchSize = config.insertDefaults.batchSize
+) => {
   const conn = getConnexion(conf);
 
   await conn.connect();
@@ -97,6 +96,4 @@ async function populateMonet(
     ok: true,
     message: `MonetDB: populated ${clients.length} clients and ${orders.length} orders.`,
   };
-}
-
-module.exports = { populateMonet, fillClientsMonet, fillOrdersMonet };
+};

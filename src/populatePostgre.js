@@ -1,7 +1,6 @@
-// populatePostgre.js
-const { getConnexion } = require("./connexion");
-const { postgreConf, insertDefaults } = require("./config");
-const conf = postgreConf;
+import { getConnexion } from "./connexion.js";
+import { config as configuration } from "./config.js";
+const conf = configuration.postgreConf;
 
 /**
  * Ensure the PostgreSQL database exists
@@ -108,11 +107,11 @@ async function fillOrdersPostgres(pool, orders = [], batchSize = 200) {
 /**
  * Main function: population des clients et orders
  */
-async function populatePostgre(
+export const populatePostgre = async (
   clients = [],
   orders = [],
-  batchSize = insertDefaults.batchSize
-) {
+  batchSize = config.insertDefaults.batchSize
+) => {
   if (!conf) return { ok: false, message: "Postgres: no config found." };
 
   await ensureDatabaseExistsPostgres(conf);
@@ -130,6 +129,4 @@ async function populatePostgre(
     ok: true,
     message: `Postgres: populated ${clients.length} clients and ${orders.length} orders.`,
   };
-}
-
-module.exports = { populatePostgre, fillClientsPostgres, fillOrdersPostgres };
+};

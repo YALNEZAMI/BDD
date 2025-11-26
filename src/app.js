@@ -1,15 +1,10 @@
-// check-ports.js
-
-const { checkConnections } = require("./connexion.js");
-const { populateMonet } = require("./populateMonetdb.js");
-const { populatePostgre } = require("./populatePostgre.js");
-const { getResultsArray } = require("./compare");
-const { getData } = require("./generateData.js");
-const { insertDefaults, server } = require("./config.js");
-const {
-  exportCumulativeGraphData,
-  createGraphFromCSV,
-} = require("./export.js");
+import { checkConnections } from "./connexion.js";
+import { populateMonet } from "./populateMonetdb.js";
+import { populatePostgre } from "./populatePostgre.js";
+import { getData } from "./generateData.js";
+import { config } from "./config.js";
+import { exportCumulativeGraphData, createGraphFromCSV } from "./export.js";
+import { getResultsArray } from "./compare.js";
 
 /**
  *
@@ -18,7 +13,7 @@ const {
  * creation des tables
  * population des tables
  */
-async function firstSetUp() {
+export const firstSetUp = async () => {
   console.log("firstSetUp");
 
   try {
@@ -31,12 +26,15 @@ async function firstSetUp() {
       return;
     }
     console.log("\n_____POSTGRE: CREATE BD,TABLES,POPULATING_____");
-    const data = getData(insertDefaults.nClients, insertDefaults.nOrders);
+    const data = getData(
+      config.insertDefaults.nClients,
+      config.insertDefaults.nOrders
+    );
     // Crée le pool **après** s'assurer que la base existe
     const populatePostgreResult = await populatePostgre(
       data.clients,
       data.orders,
-      insertDefaults.batchSize
+      config.insertDefaults.batchSize
     );
     if (populatePostgreResult.ok) {
       console.log(populatePostgreResult.message);
@@ -48,7 +46,7 @@ async function firstSetUp() {
     const populateMonetResult = await populateMonet(
       data.clients,
       data.orders,
-      insertDefaults.batchSize
+      config.insertDefaults.batchSize
     );
     if (populateMonetResult.ok) {
       console.log(populateMonetResult.message);
@@ -60,7 +58,7 @@ async function firstSetUp() {
     console.error("Erreur :", err);
     return false;
   }
-}
+};
 /**
  * @param params:{
  * nbrStart: int// à partir de quelle nbr de requetes commencer
@@ -76,7 +74,7 @@ async function firstSetUp() {
  * @return {Array <{ok: boolean, message: string, url: string, csvPath: string}>}
  *
  */
-async function traiter(params) {
+export const traiter = async (params) => {
   try {
     console.log("\n____PERFORMING QUERIES_____");
     console.log("processing queries...");
@@ -104,13 +102,13 @@ async function traiter(params) {
     return {
       ok: true,
       message: " Traitement terminé",
-      url: server.local_url + "/bin/" + fileName,
-      csvPath: server.local_url + "/bin/" + csvName,
+      url: config.server.local_url + "/bin/" + fileName,
+      csvPath: config.server.local_url + "/bin/" + csvName,
     };
   } catch (err) {
     console.error("Erreur :", err);
   }
-}
+};
 /**
  * @param queries
  * @return string le type majoritaire dans queries => OLTP | OLAP
@@ -133,5 +131,3 @@ function getMajorType(queries) {
     return "OLAP/OLTP";
   }
 }
-
-module.exports = { firstSetUp, traiter };

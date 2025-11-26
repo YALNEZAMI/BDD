@@ -1,11 +1,15 @@
-// export.js
-const { ChartJSNodeCanvas } = require("chartjs-node-canvas");
-const fs = require("fs");
-const path = require("path");
-const { parse } = require("csv-parse/sync");
+import path from "path";
+import { ChartJSNodeCanvas } from "chartjs-node-canvas";
+import fs from "fs";
+import { parse } from "csv-parse/sync";
+import { fileURLToPath } from "url";
 
 // === public A LA RACINE DU PROJET ===
-const PUBLIC_DIR = path.join(__dirname, "..", "public/bin");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const PUBLIC_DIR = path.join(__dirname, "..", "public", "bin");
+console.log(PUBLIC_DIR);
 if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
 
 /**
@@ -13,7 +17,7 @@ if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
  * @param {string} type - "OLTP" ou "OLAP"
  * @param {number} jump - échantillonnage
  */
-function exportCumulativeGraphData(results, params) {
+export const exportCumulativeGraphData = (results, params) => {
   const csvLines = ["NumExecutedQueries,PostgreSQL,MonetDB"];
   const jump = params.jump || 1;
   let pgCum = 0;
@@ -35,7 +39,7 @@ function exportCumulativeGraphData(results, params) {
   fs.writeFileSync(outPath, csvLines.join("\n"));
   console.log(`Cumulative CSV saved at ${outPath}`);
   return outPath;
-}
+};
 
 const width = 800;
 const height = 600;
@@ -46,7 +50,11 @@ const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
  * @param {string} outputFileName - nom du fichier de sortie
  * @param {string} queryMajorType - "OLTP" ou "OLAP"
  */
-async function createGraphFromCSV(csvFile, outputFileName, queryMajorType) {
+export const createGraphFromCSV = async (
+  csvFile,
+  outputFileName,
+  queryMajorType
+) => {
   const content = fs.readFileSync(csvFile);
   const records = parse(content, { columns: true });
 
@@ -102,10 +110,4 @@ async function createGraphFromCSV(csvFile, outputFileName, queryMajorType) {
 
   console.log("Graphique généré dans", outPath);
   return outputFileName;
-}
-
-module.exports = {
-  exportCumulativeGraphData,
-  createGraphFromCSV,
-  PUBLIC_DIR,
 };

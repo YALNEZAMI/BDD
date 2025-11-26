@@ -1,4 +1,4 @@
-const { faker } = require("@faker-js/faker");
+import { faker } from "@faker-js/faker";
 
 /**
  *
@@ -46,10 +46,8 @@ function generateAmount(max = 100) {
  * @param {*} nbrOrders
  * @returns un object {clients: tableau de clients générés, orders: tableau de commandes générés}
  */
-function getData(nbrClients, nbrOrders) {
+export const getData = (nbrClients, nbrOrders) => {
   const clients = generateClients(nbrClients);
   const orders = generateOrders(nbrOrders, clients);
   return { clients, orders };
-}
-
-module.exports = { getData };
+};

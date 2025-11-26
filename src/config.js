@@ -1,6 +1,6 @@
 // config.js
 const N = 1000;
-module.exports = {
+export const config = {
   server: {
     port: 3000,
     host: "localhost",
