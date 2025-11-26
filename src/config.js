@@ -9,7 +9,7 @@ export const config = {
     local_url: "http://localhost:3000",
   },
   postgreConf: {
-    sgbd: "postgre",
+    sgbd: "postgres",
     user: "postgres",
     host: "localhost",
     database: "demo", // postgresql db name (only lowercase names)

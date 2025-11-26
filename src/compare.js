@@ -6,7 +6,7 @@ import { getConnexion } from "./connexion.js";
 async function runQueryPostgre(pool, sql, params = []) {
   const start = process.hrtime.bigint();
   const result = {
-    engine: "postgre",
+    engine: "postgres",
     durationMs: 0,
   };
 

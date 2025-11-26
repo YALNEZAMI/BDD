@@ -11,27 +11,19 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PUBLIC_DIR = path.join(__dirname, "..", "public", "bin");
-console.log(PUBLIC_DIR);
+const PUBLIC_DIR = path.join(__dirname, "..", "public");
 // Tell express to serve static files from PUBLIC_DIR at web root "/"
 app.use(express.static(PUBLIC_DIR));
 
-// optional: quick debug route to list files in public
-app.get("/__public_files__", (req, res) => {
-  try {
-    const files = fs.readdirSync(PUBLIC_DIR);
-    res.json({ path: PUBLIC_DIR, files });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
 // Route simple
 app.get("/", async (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
 // Route simple
 app.get("/setup", async (req, res) => {
+  console.log("setup route");
+
   const setup = await firstSetUp();
   res.send({ ok: setup, message: "setup réussi" });
 });
@@ -44,6 +36,7 @@ app.post("/traiter", async (req, res) => {
 const PORT = 3000;
 
 // Démarrer le serveur
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
+  await firstSetUp();
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

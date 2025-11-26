@@ -1,12 +1,13 @@
 import { getConnexion } from "./connexion.js";
 import { config as configuration } from "./config.js";
+import { Client } from "pg";
+
 const conf = configuration.postgreConf;
 
 /**
  * Ensure the PostgreSQL database exists
  */
 async function ensureDatabaseExistsPostgres(conf) {
-  const { Client } = require("pg");
   const adminConf = { ...conf, database: "postgres" };
   const adminClient = new Client(adminConf);
   await adminClient.connect();

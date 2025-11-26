@@ -54,20 +54,19 @@ export const checkConnections = async () => {
  * @returns retourne un driver (monetdb | postgre)
  */
 export const getConnexion = (conf) => {
-  if (conf.sgbd === "postgre") {
+  if (conf.sgbd === "postgres") {
     const pool = new Pool(conf);
     return normalizeConnexion(pool, conf.sgbd);
   }
 
   if (conf.sgbd === "monetdb") {
     const conn = new Connection({
-      host: monetdbConf.host,
-      port: monetdbConf.port,
-      user: monetdbConf.user,
-      password: monetdbConf.password,
-      database: monetdbConf.database,
+      host: config.monetdbConf.host,
+      port: config.monetdbConf.port,
+      user: config.monetdbConf.user,
+      password: config.monetdbConf.password,
+      database: config.monetdbConf.database,
     });
-    console.log(conn);
 
     return normalizeConnexion(conn, conf.sgbd);
   }
@@ -80,9 +79,9 @@ export const getConnexion = (conf) => {
  * @returns une forme unifié du driver initial
  */
 function normalizeConnexion(conn, engine) {
-  if (engine === "postgre") {
+  if (engine === "postgres") {
     return {
-      type: "postgre",
+      type: "postgres",
       raw: conn,
       connect: async () => {}, // Pool se connecte automatiquement
       execute: async (sql, params) => await conn.query(sql, params),

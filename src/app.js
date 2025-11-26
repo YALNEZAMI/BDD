@@ -14,8 +14,6 @@ import { getResultsArray } from "./compare.js";
  * population des tables
  */
 export const firstSetUp = async () => {
-  console.log("firstSetUp");
-
   try {
     console.log("\n____CHECK CONNECTIONS_____");
     const bothConnected = await checkConnections();

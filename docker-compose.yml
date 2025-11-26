@@ -38,33 +38,19 @@ services:
     volumes:
       - monetdb_data:/var/monetdb5
     environment:
-      MDB_DAEMONPASS: monetdb   # daemon passphrase (change in production)
-      MDB_SHOW_VARS: "1"
-      # Do NOT put MDB_DB_ADMIN_PASS directly here in plaintext. Instead the image supports
-      # MDB_DB_ADMIN_PASS_FILE which points to a path in the container where Docker places the secret.
-      MDB_DB_ADMIN_PASS_FILE: /run/secrets/monetdb_admin_pass
-      # Optionally auto-create a DB named 'demo' on first run; set to empty string '' to disable.
+      MDB_DAEMONPASS: monetdb
+      MDB_DB_ADMIN_PASS: monetdb
       MDB_CREATE_DBS: demo
-    entrypoint: >
+    command: >
       sh -c "
-        # create farm if missing
-        if [ ! -d /var/monetdb5/dbfarm ]; then
+        if [ ! -f /var/monetdb5/.monetdb.properties ]; then
           echo 'Initializing MonetDB farm...';
           monetdbd create /var/monetdb5;
         fi &&
-        monetdbd start /var/monetdb5 &&
-        # The official image will use MDB_CREATE_DBS + the admin pass file to create DBs.
-        # We attempt to release the demo DB if present; ignore errors so the container stays up.
+        monetdbd start -n /var/monetdb5 &&
         monetdb release demo || true &&
-        tail -f /dev/null
+        sleep infinity
       "
-    healthcheck:
-      test: ["CMD-SHELL", "mclient -u monetdb -P $(cat /run/secrets/monetdb_admin_pass) -d demo -e '\\q' || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    secrets:
-      - monetdb_admin_pass
 
 volumes:
   postgres_data:

@@ -27,5 +27,14 @@ faire un test en cliquant sur une des deux options de "Traitement pertinants ""
 
 # en developpement(ne marche pas pour le moment)
 
-docker: si docker installé --> lancer les serveurs dessu en lançant : docker compose up -d
+docker des servers sgbd:
+docker compose up -d
+
+docker du benchmark:
+se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
+"docker build -t benchmark .""
+puis
+"docker run -p 3000:3000 benchmark"
+
 verifier leur lancement en lançant : docker ps
+vous devez voir

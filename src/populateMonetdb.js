@@ -81,7 +81,7 @@ export const populateMonet = async (
   orders,
   batchSize = config.insertDefaults.batchSize
 ) => {
-  const conn = getConnexion(conf);
+  const conn = getConnexion(config.monetdbConf);
 
   await conn.connect();
 
