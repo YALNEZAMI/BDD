@@ -160,9 +160,19 @@ const customSql = document.getElementById("customSql");
 const runBtn = document.getElementById("runBtn");
 const statusEl = document.getElementById("status");
 const resultImage = document.getElementById("resultImage");
+const resultImage_throughput = document.getElementById(
+  "resultImage_throughput"
+);
+
 const downloadingsContainer = document.getElementById("downloadingsContainer");
+const downloadingsContainer_throughput = document.getElementById(
+  "downloadingsContainer_throughput"
+);
+
 const csvLink = document.getElementById("csvLink");
+const csvLink_throughput = document.getElementById("csvLink_throughput");
 const pngLink = document.getElementById("pngLink");
+const pngLink_throughput = document.getElementById("pngLink_throughput");
 
 const nbrStartEl = document.getElementById("nbrStart");
 const nbrEndEl = document.getElementById("nbrEnd");
@@ -196,7 +206,7 @@ function makeCard(q) {
     "border rounded p-3 text-left hover:shadow-sm transition flex flex-col";
   el.innerHTML = `<div class="flex items-center justify-between"><div class="font-medium">${escapeHtml(
     q.label
-  )}</div><div class="text-xs text-slate-500">${q.type.toUpperCase()}</div></div><pre class="text-xs text-slate-600 mt-2 whitespace-pre-wrap">${escapeHtml(
+  )}</div><div class="text-xs text-slate-500">${q.type.toUpperCase()}</div></div><pre class="text-xs text-slate-600 mt-2 whitespace-pre-wrap truncate">${escapeHtml(
     q.sql
   )}</pre>`;
   el.addEventListener("click", () => addPresetQuery(q));
@@ -363,7 +373,10 @@ runBtn.addEventListener("click", async () => {
   //hide previous result
   resultImage.src = "";
   resultImage.classList.add("hidden");
+  resultImage_throughput.src = "";
+  resultImage_throughput.classList.add("hidden");
   downloadingsContainer.classList.add("hidden");
+  downloadingsContainer_throughput.classList.add("hidden");
 
   const nbrStart = Number(nbrStartEl.value) || 1;
   const jump = Number(jumpEl.value) || 1;
@@ -414,45 +427,66 @@ runBtn.addEventListener("click", async () => {
       const text = await resp.text();
       throw new Error("Erreur serveur: " + resp.status + " " + text);
     }
-
+    /**
+ *  return {
+       ok: boolean,
+       message: string
+       png_timing: string
+       csv_timing: string
+       png_throughput:string
+       csv_throughput:string
+            };
+ */
     const body = await resp.json();
 
     if (!body.ok) throw new Error(body.message || "Erreur inconnue");
 
     setStatus("Traitement terminé.");
-    let url = body.url || body.path || body.file || null;
-    if (!url) {
+    if (!body.png_timing) {
       setStatus("Réponse OK mais pas d'URL reçue.");
       return;
     }
 
-    if (url.startsWith("file://")) url = url.replace("file://", "");
-    const m = url.match(/.*\/public\/(.+)$/);
-    if (m) url = "/" + m[1];
+    if (body.png_timing.startsWith("file://"))
+      body.png_timing = body.png_timing.replace("file://", "");
+    const m = body.png_timing.match(/.*\/public\/(.+)$/);
+    if (m) body.png_timing = "/" + m[1];
 
-    if (body.csvPath) {
-      let csvUrl = body.csvPath;
-      const m = csvUrl.match(/.*\/public\/(.+)$/);
-      if (m) csvUrl = "/" + m[1];
+    if (body.csv_timing) {
+      const m = body.csv_timing.match(/.*\/public\/(.+)$/);
+      if (m) body.csv_timing = "/" + m[1];
 
       // Ajouter un timestamp pour forcer le téléchargement
       const timestamp = Date.now();
-      csvLink.href = csvUrl + "?t=" + timestamp;
-      pngLink.href = url + "?t=" + timestamp;
+      csvLink.href = body.csv_timing + "?t=" + timestamp;
+      csvLink_throughput.href = body.csv_throughput + "?t=" + timestamp;
+      pngLink.href = body.png_timing + "?t=" + timestamp;
+      pngLink_throughput.href = body.png_throughput + "?t=" + timestamp;
       downloadingsContainer.classList.remove("hidden");
+      downloadingsContainer_throughput.classList.remove("hidden");
     } else {
       downloadingsContainer.classList.add("hidden");
+      downloadingsContainer_throughput.classList.add("hidden");
     }
     // Après avoir récupéré `url` du serveur
     const timestamp = Date.now();
-    resultImage.src = url + "?t=" + timestamp;
+    resultImage.src = body.png_timing + "?t=" + timestamp;
+    resultImage_throughput.src = body.png_throughput + "?t=" + timestamp;
     resultImage.classList.remove("hidden");
+    resultImage_throughput.classList.remove("hidden");
   } catch (err) {
     console.error(err);
     setStatus("Erreur: " + (err.message || err));
   } finally {
     hideLoader(); // <-- stop loader
   }
+
+  setTimeout(() => {
+    csvLink.scrollIntoView({
+      block: "center",
+      behavior: "smooth", // pour un scroll animé
+    });
+  }, 500);
 });
 
 function setStatus(s) {

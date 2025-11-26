@@ -1,7 +1,7 @@
 // config.js
 const N = 1000;
 const SGBD_SERVICES_DOCKERIZED = false;
-const APP_DOCKERIZED = true;
+const APP_DOCKERIZED = false;
 export const config = {
   server: {
     port: 3000,

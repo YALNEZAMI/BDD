@@ -3,7 +3,12 @@ import { populateMonet } from "./populateMonetdb.js";
 import { populatePostgre } from "./populatePostgre.js";
 import { getData } from "./generateData.js";
 import { config } from "./config.js";
-import { exportCumulativeGraphData, createGraphFromCSV } from "./export.js";
+import {
+  exportCumulativeGraphData_graphTiming,
+  createGraphFromCSV_graphTiming,
+  exportCumulativeGraphData_graphThroughput,
+  createBarChartFromCSV_throughput,
+} from "./export.js";
 import { getResultsArray } from "./compare.js";
 
 /**
@@ -84,24 +89,42 @@ export const traiter = async (params) => {
     // console.log(res);
 
     console.log("creating csv file...");
-    const CSV = exportCumulativeGraphData(res, params);
+    const csv_timing_fileName = "result_timing.csv";
+    const csv_throughput_fileName = "result_throughput.csv";
+    const png_timing_fileName = "graphe_timing.png";
+    const png_throughput_fileName = "graphe_throughput.png";
+    const CSV_graphTiming = exportCumulativeGraphData_graphTiming(
+      res,
+      params,
+      csv_timing_fileName
+    );
+    const CSV_graphThroughput = exportCumulativeGraphData_graphThroughput(
+      res,
+      params,
+      csv_throughput_fileName
+    );
+
     console.log("creating graphique chart...");
-    const fileName = await createGraphFromCSV(
-      CSV,
-      "result" + ".png",
+    const fileName_graphTiming = await createGraphFromCSV_graphTiming(
+      CSV_graphTiming,
+      png_timing_fileName,
       getMajorType(params.queries)
     );
-    let split = CSV.split("/");
-    if (split.length == 1) {
-      split = CSV.split("\\");
-    }
-    const csvName = split[split.length - 1];
+    const fileName_throughput = createBarChartFromCSV_throughput(
+      CSV_graphThroughput,
+      png_throughput_fileName,
+      getMajorType(params.queries)
+    );
 
     return {
       ok: true,
       message: " Traitement terminé",
-      url: config.server.local_url + "/bin/" + fileName,
-      csvPath: config.server.local_url + "/bin/" + csvName,
+      png_timing: config.server.local_url + "/bin/" + png_timing_fileName,
+      csv_timing: config.server.local_url + "/bin/" + csv_timing_fileName,
+      png_throughput:
+        config.server.local_url + "/bin/" + png_throughput_fileName,
+      csv_throughput:
+        config.server.local_url + "/bin/" + csv_throughput_fileName,
     };
   } catch (err) {
     console.error("Erreur :", err);

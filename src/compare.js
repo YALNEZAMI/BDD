@@ -10,10 +10,25 @@ async function runQueryPostgre(pool, sql, params = []) {
     durationMs: 0,
   };
 
-  // Exécution de la requête
   const raw = await pool.execute(sql, params);
+
   const end = process.hrtime.bigint();
   result.durationMs = Number(end - start) / 1e6;
+  const rowCount =
+    raw.rowCount || raw.affectedRows || raw.rowCnt || raw.rows.length;
+  // console.log("row count pg", rowCount);
+
+  if (
+    result.durationMs &&
+    rowCount &&
+    result.durationMs != 0 &&
+    rowCount != 0
+  ) {
+    result.throughput = Number((rowCount / result.durationMs).toFixed(3));
+    // console.log("throughput pg", result.throughput);
+  } else {
+    result.throughput = 0;
+  }
 
   return result;
 }
@@ -29,9 +44,25 @@ async function runQueryMonetdb(conn, sql) {
   };
 
   // Exécution principale
+
   const raw = await conn.execute(sql);
+
   const end = process.hrtime.bigint();
   result.durationMs = Number(end - start) / 1e6;
+  const rowCount = raw.affectedRows || raw.rowCnt || raw.data.length;
+  // console.log("row count mn", rowCount);
+
+  if (
+    result.durationMs &&
+    rowCount &&
+    result.durationMs != 0 &&
+    rowCount != 0
+  ) {
+    result.throughput = Number((rowCount / result.durationMs).toFixed(3));
+    // console.log("throughput mn", result.throughput);
+  } else {
+    result.throughput = 0;
+  }
 
   return result;
 }
@@ -64,7 +95,7 @@ export const getResultsArray = async (
         runQueryMonetdb(conn, q.sql), // peut s'exécuter en parallèle
       ]);
 
-      results.push({ q, pg: pgRes, monet: monetRes });
+      results.push({ q, pg: pgRes, monetdb: monetRes });
     }
   }
 

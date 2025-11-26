@@ -67,7 +67,6 @@ export const getConnexion = (conf) => {
       password: config.monetdbConf.password,
       database: config.monetdbConf.database,
     });
-
     return normalizeConnexion(conn, conf.sgbd);
   }
 };

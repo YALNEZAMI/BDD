@@ -32,7 +32,7 @@
 
         <div
           id="presetQueries"
-          class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 max-h-72 overflow-y-auto overflow-x-hidden"
         >
           <!-- cards injected by front.js -->
         </div>
@@ -75,7 +75,10 @@
         </details>
 
         <h3 class="text-lg font-medium mb-2">Sélection courante</h3>
-        <div id="selectedList" class="mb-4 space-y-2">
+        <div
+          id="selectedList"
+          class="mb-4 space-y-2 max-h-42 overflow-x-hidden overflow-y-auto"
+        >
           <!-- selected items shown here -->
         </div>
 
@@ -201,82 +204,149 @@
           </svg>
           <span>Traitement en cours...</span>
         </div>
-
-        <div id="preview" class="space-y-2">
-          <div class="flex gap-2">
-            <p id="type_requete_courrant" class="font-bold">
-              Aperçu pour: 0 OLTP, 0 OLAP
-              <br />
-              Total requêtes 0
-            </p>
-          </div>
-          <img
-            id="resultImage"
-            src=""
-            alt="Result"
-            class="max-w-full rounded shadow hidden"
-          />
-          <!--options de téléchargement-->
-          <div class="flex flex-col gap-4 hidden" id="downloadingsContainer">
-            <a
-              id="csvLink"
-              class="text-indigo-600 underline flex gap-2"
-              href="#"
-              target="_blank"
-            >
-              Télécharger : result.csv
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                /></svg
-            ></a>
-            <a
-              id="pngLink"
-              class="text-indigo-600 underline flex gap-2"
-              href="#"
-              target="_blank"
-            >
-              Voir Graph.png
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="size-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-            </a>
-          </div>
-        </div>
       </aside>
     </main>
+    <!--resultat graphique-->
+    <section class="flex w-full">
+      <div id="preview" class="space-y-2 w-full">
+        <div class="flex justify-center gap-2">
+          <p id="type_requete_courrant" class="font-bold">
+            Aperçu pour: 0 OLTP, 0 OLAP
+            <br />
+            Total requêtes 0
+          </p>
+        </div>
 
-    <footer class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500">
-      <div>
-        Astuce : sélectionne quelques requêtes représentatives pour des tests
-        rapides.
+        <div class="flex p-10">
+          <!--resultat timing-->
+          <div class="m-4">
+            <img
+              id="resultImage"
+              src=""
+              alt="Result"
+              class="max-w-full rounded shadow hidden"
+            />
+            <!--options de téléchargement-->
+            <div
+              class="flex flex-wrap justify-center items-center p-3 text-pink-700 gap-6 hidden"
+              id="downloadingsContainer"
+            >
+              <a
+                id="csvLink"
+                class="hover:text-pink-500 underline flex gap-2"
+                href="#"
+                target="_blank"
+              >
+                Télécharger : result_timing.csv
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                  /></svg
+              ></a>
+              <a
+                id="pngLink"
+                class="hover:text-pink-500 underline flex gap-2"
+                href="#"
+                target="_blank"
+              >
+                Voir graphe_timing.png
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+          <!--resultat throughput-->
+          <div class="m-5">
+            <img
+              id="resultImage_throughput"
+              src=""
+              alt="_throughput"
+              class="max-w-full rounded shadow hidden"
+            />
+            <!--options de téléchargement-->
+            <div
+              class="flex flex-wrap justify-center items-center p-3 text-pink-700 gap-6 hidden"
+              id="downloadingsContainer_throughput"
+            >
+              <a
+                id="csvLink_throughput"
+                class="hover:text-pink-500 underline flex gap-2"
+                href="#"
+                target="_blank"
+              >
+                Télécharger : result_throughput.csv
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+                  /></svg
+              ></a>
+              <a
+                id="pngLink_throughput"
+                class="hover:text-pink-500 underline flex gap-2"
+                href="#"
+                target="_blank"
+              >
+                Voir graphe_throughput.png
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-6"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
-    </footer>
+    </section>
     <script src="/front.js"></script>
   </body>
 </html>
