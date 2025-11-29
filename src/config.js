@@ -1,6 +1,6 @@
 // config.js
 const N = 1000;
-const SGBD_SERVICES_DOCKERIZED = false;
+const SGBD_SERVICES_DOCKERIZED = false; //laisser à false
 const APP_DOCKERIZED = false;
 export const config = {
   server: {
