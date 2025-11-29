@@ -7,3 +7,6 @@ MonetDB reste quasi-constant → column-store pas optimisé pour les petites mis
 OLAP :
 
 MonetDB surpasse PostgreSQL pour les scans/agrégations → les colonnes contiguës et le traitement vectoriel font la différence.
+
+
+PB: monetdb driver doesn't support "EXPLAIN sqlQuery" nor "EXPLAIN ANALYZE sqlQuery"
