@@ -90,8 +90,7 @@ function isSingleSQLQuery(sql) {
   return false;
 }
 
-// UI logic pour index.html
-
+let buttonsDisabled = false;
 // === Pré-sets (copie de tes queries) ===
 const PRESET_QUERIES = [
   {
@@ -366,6 +365,10 @@ jumpEl.addEventListener("input", () => {
 });
 // run handler
 runBtn.addEventListener("click", async () => {
+  if (buttonsDisabled) {
+    alert("Un traitement est déjà en cours. Veuillez patienter.");
+    return;
+  }
   if (selected.length === 0) {
     alert("Sélectionne au moins une requête.");
     return;
@@ -404,6 +407,7 @@ runBtn.addEventListener("click", async () => {
     return;
   }
 
+  buttonsDisabled = true;
   const object = {
     nbrStart,
     nbrEnd,
@@ -497,6 +501,7 @@ runBtn.addEventListener("click", async () => {
         toast.classList.remove("hidden");
       }
     }
+    buttonsDisabled = false;
   } catch (err) {
     console.error(err);
     setStatus("Erreur: " + (err.message || err));
@@ -509,7 +514,7 @@ runBtn.addEventListener("click", async () => {
       block: "center",
       behavior: "smooth", // pour un scroll animé
     });
-  }, 500);
+  }, 300);
 });
 
 function setStatus(s) {
