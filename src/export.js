@@ -5,8 +5,8 @@ import { parse } from "csv-parse/sync";
 import { fileURLToPath } from "url";
 import csv from "csv-parser";
 
-const width = 700;
-const height = 700;
+const width = 600;
+const height = 600;
 const backgroundColor = "white";
 
 const chartJSNodeCanvas = new ChartJSNodeCanvas({ width, height });
