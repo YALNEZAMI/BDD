@@ -1,7 +1,7 @@
 // config.js
 const N = 1000;
 const SGBD_SERVICES_DOCKERIZED = false; //laisser à false
-const APP_DOCKERIZED = false;
+const APP_DOCKERIZED = false; //mettre à vrai si app lancée avec docker
 export const config = {
   server: {
     port: 3000,
