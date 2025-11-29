@@ -295,6 +295,7 @@ function setCurrentParameteres() {
       ? "Total queries: " + selected.length * Number(nbrEndEl.value)
       : ""
   }`;
+  type_requete_courrant.classList.remove("hidden");
 }
 // add custom query
 addCustomBtn.addEventListener("click", (ev) => {

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
@@ -13,6 +14,7 @@
       }
     </style>
   </head>
+
   <body class="bg-slate-50 text-slate-800 min-h-screen">
     <header class="bg-white shadow-sm">
       <div class="max-w-6xl mx-auto px-4 py-6">
@@ -41,12 +43,14 @@
           <summary class="cursor-pointer font-medium text-slate-700">
             Ajouter une requête personnalisée
           </summary>
+
           <div class="mt-3 grid gap-2">
             <input
               id="customLabel"
               class="border p-2 rounded"
               placeholder="Label (ex: my_olap_1)"
             />
+
             <textarea
               id="customSql"
               rows="4"
@@ -59,6 +63,7 @@
                 <input type="radio" name="customType" value="oltp" checked />
                 <span>OLTP</span>
               </label>
+
               <label class="flex items-center gap-2">
                 <input type="radio" name="customType" value="olap" />
                 <span>OLAP</span>
@@ -75,12 +80,11 @@
         </details>
 
         <h3 class="text-lg font-medium mb-2">Sélection courante</h3>
+
         <div
           id="selectedList"
           class="mb-4 space-y-2 max-h-42 overflow-x-hidden overflow-y-auto"
-        >
-          <!-- selected items shown here -->
-        </div>
+        ></div>
 
         <div class="flex flex-wrap gap-2">
           <button
@@ -89,24 +93,28 @@
           >
             Effacer sélection
           </button>
+
           <button
             id="fillAllOLTP"
             class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
           >
             Ajouter tous OLTP
           </button>
+
           <button
             id="fillAllOLAP"
             class="bg-slate-600 text-white px-3 py-1 rounded hover:bg-slate-700"
           >
             Ajouter tous OLAP
           </button>
+
           <button
             id="onlyOLTP"
             class="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
           >
             Only OLTP
           </button>
+
           <button
             id="onlyOLAP"
             class="bg-slate-600 text-white px-3 py-1 rounded hover:bg-slate-700"
@@ -116,10 +124,11 @@
         </div>
       </section>
 
-      <!-- Right: Parameters + submit + preview -->
+      <!-- Right panel -->
       <aside class="bg-white p-4 rounded-lg shadow-sm">
         <div class="flex flex-col gap-2 mb-10">
           <h2 class="text-lg font-medium mb-3">Traitements pertinants:</h2>
+
           <div class="flex justify-center gap-2">
             <button
               id="remarkableOLTP"
@@ -128,6 +137,7 @@
             >
               OLTP
             </button>
+
             <button
               id="remarkableOLAP"
               class="bg-slate-600 text-white px-3 py-1 rounded hover:bg-slate-700"
@@ -137,11 +147,12 @@
             </button>
           </div>
         </div>
+
         <h2 class="text-lg font-medium mb-3">Paramètres & exécution</h2>
 
-        <label class="block text-sm font-medium"
-          >Nombre d'éxecutions (début interval d'affichage )</label
-        >
+        <label class="block text-sm font-medium">
+          Début intervalle affichage courbe
+        </label>
         <input
           id="nbrStart"
           type="number"
@@ -150,9 +161,9 @@
           min="1"
         />
 
-        <label class="block text-sm font-medium"
-          >Nombre d'éxecutions (fin interval d'affichage )</label
-        >
+        <label class="block text-sm font-medium">
+          Fin intervalle affichage courbe
+        </label>
         <input
           id="nbrEnd"
           type="number"
@@ -162,7 +173,7 @@
         />
 
         <label class="block text-sm font-medium"
-          >Espacement (échantillonnage)</label
+          >Espacement axe des abscisses</label
         >
         <input
           id="jump"
@@ -178,9 +189,9 @@
         >
           Lancer le traitement
         </button>
-        <!--loader-->
+
         <div id="status" class="text-sm text-slate-600 mb-3"></div>
-        <!--loader-->
+
         <div id="loader" class="hidden flex items-center gap-2 mb-3">
           <svg
             class="animate-spin h-5 w-5 text-emerald-600"
@@ -204,28 +215,26 @@
           </svg>
           <span>Traitement en cours...</span>
         </div>
-      </aside>
-    </main>
-    <!--resultat graphique-->
-    <section class="flex w-full">
-      <div id="preview" class="space-y-2 w-full">
-        <div class="flex justify-between gap-2 px-10">
-          <div class="flex flex-col justify-center gap-2">
-            <p id="type_requete_courrant" class="font-bold">
-              Aperçu pour: 0 OLTP, 0 OLAP
-              Total requêtes 0
-            </p>
-          
-          </div>
-           <div>
-             <p id="toast" class="hidden bg-red-100 text-red-700 p-2 rounded "
+        <div class="flex flex-col">
+          <div>
+            <p id="toast" class="hidden bg-red-100 text-red-700 p-2 rounded">
               Le débit n'a pas pu être calculé pour cette requête.
             </p>
-            </div>
+          </div>
+          <div class="flex flex-col justify-center gap-2">
+            <p id="type_requete_courrant" class="font-bold hidden">
+              Aperçu pour: 0 OLTP, 0 OLAP — Total requêtes 0
+            </p>
+          </div>
         </div>
+      </aside>
+    </main>
 
+    <!-- Résultats graphiques -->
+    <section class="flex w-full">
+      <div id="preview" class="space-y-2 w-full">
         <div class="flex justify-center p-10">
-          <!--resultat timing-->
+          <!-- Timing -->
           <div class="m-4">
             <img
               id="resultImage"
@@ -233,10 +242,10 @@
               alt="Result"
               class="max-w-full rounded shadow hidden"
             />
-            <!--options de téléchargement-->
+
             <div
-              class="flex flex-wrap justify-center items-center p-3 text-pink-700 gap-6 hidden"
               id="downloadingsContainer"
+              class="flex flex-wrap justify-center items-center p-3 text-pink-700 gap-6 hidden bg-pink-100"
             >
               <a
                 id="csvLink"
@@ -257,8 +266,10 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                  /></svg
-              ></a>
+                  />
+                </svg>
+              </a>
+
               <a
                 id="pngLink"
                 class="hover:text-pink-500 underline flex gap-2"
@@ -288,9 +299,8 @@
               </a>
             </div>
           </div>
-          <!--message de non resultats throughput-->
 
-          <!--resultat throughput-->
+          <!-- Throughput -->
           <div class="m-5">
             <img
               id="resultImage_throughput"
@@ -298,10 +308,10 @@
               alt="_throughput"
               class="max-w-full rounded shadow hidden"
             />
-            <!--options de téléchargement-->
+
             <div
-              class="flex flex-wrap justify-center items-center p-3 text-pink-700 gap-6 hidden"
               id="downloadingsContainer_throughput"
+              class="flex flex-wrap justify-center items-center p-3 text-pink-700 bg-pink-100 gap-6 hidden"
             >
               <a
                 id="csvLink_throughput"
@@ -322,8 +332,10 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-                  /></svg
-              ></a>
+                  />
+                </svg>
+              </a>
+
               <a
                 id="pngLink_throughput"
                 class="hover:text-pink-500 underline flex gap-2"
@@ -356,6 +368,7 @@
         </div>
       </div>
     </section>
+
     <script src="/front.js"></script>
   </body>
 </html>
