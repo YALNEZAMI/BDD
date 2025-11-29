@@ -110,14 +110,16 @@ export const traiter = async (params) => {
       png_timing_fileName,
       getMajorType(params.queries)
     );
-    const fileName_throughput = createBarChartFromCSV_throughput(
-      CSV_graphThroughput,
+    const fileName_throughput = await createBarChartFromCSV_throughput(
+      CSV_graphThroughput.path,
       png_throughput_fileName,
       getMajorType(params.queries)
     );
 
-    return {
+    const response = {
       ok: true,
+      isBarsNulls: CSV_graphThroughput.isNull,
+      ignored: CSV_graphThroughput.ignored,
       message: " Traitement terminé",
       png_timing: config.server.local_url + "/bin/" + png_timing_fileName,
       csv_timing: config.server.local_url + "/bin/" + csv_timing_fileName,
@@ -126,6 +128,9 @@ export const traiter = async (params) => {
       csv_throughput:
         config.server.local_url + "/bin/" + csv_throughput_fileName,
     };
+    console.log(response);
+
+    return response;
   } catch (err) {
     console.error("Erreur :", err);
   }

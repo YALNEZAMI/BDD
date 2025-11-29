@@ -210,11 +210,16 @@
     <section class="flex w-full">
       <div id="preview" class="space-y-2 w-full">
         <div class="flex justify-center gap-2">
-          <p id="type_requete_courrant" class="font-bold">
-            Aperçu pour: 0 OLTP, 0 OLAP
-            <br />
-            Total requêtes 0
-          </p>
+          <div class="flex flex-col justify-center gap-2">
+            <p id="type_requete_courrant" class="font-bold">
+              Aperçu pour: 0 OLTP, 0 OLAP
+              Total requêtes 0
+            </p>
+           <div> <p id="toast" class="hidden bg-red-100 text-red-700 p-2 rounded "
+              Le débit n'a pas pu être calculé pour cette requête.
+            </p>
+            </div>
+          </div>
         </div>
 
         <div class="flex p-10">
@@ -281,6 +286,8 @@
               </a>
             </div>
           </div>
+          <!--message de non resultats throughput-->
+
           <!--resultat throughput-->
           <div class="m-5">
             <img

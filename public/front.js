@@ -186,7 +186,7 @@ const onlyOLAP = document.getElementById("onlyOLAP");
 
 const loaderEl = document.getElementById("loader");
 const type_requete_courrant = document.getElementById("type_requete_courrant");
-
+const toast = document.getElementById("toast");
 function showLoader() {
   loaderEl.classList.remove("hidden");
 }
@@ -377,6 +377,9 @@ runBtn.addEventListener("click", async () => {
   resultImage_throughput.classList.add("hidden");
   downloadingsContainer.classList.add("hidden");
   downloadingsContainer_throughput.classList.add("hidden");
+  toast.classList.add("hidden");
+  csvLink.href = "";
+  csvLink_throughput.href = "";
 
   const nbrStart = Number(nbrStartEl.value) || 1;
   const jump = Number(jumpEl.value) || 1;
@@ -435,6 +438,7 @@ runBtn.addEventListener("click", async () => {
        csv_timing: string
        png_throughput:string
        csv_throughput:string
+       isBarsNulls:boolean
             };
  */
     const body = await resp.json();
@@ -452,28 +456,47 @@ runBtn.addEventListener("click", async () => {
     const m = body.png_timing.match(/.*\/public\/(.+)$/);
     if (m) body.png_timing = "/" + m[1];
 
+    // Ajouter un timestamp pour forcer le téléchargement
+    const timestamp = Date.now();
     if (body.csv_timing) {
       const m = body.csv_timing.match(/.*\/public\/(.+)$/);
       if (m) body.csv_timing = "/" + m[1];
 
-      // Ajouter un timestamp pour forcer le téléchargement
-      const timestamp = Date.now();
       csvLink.href = body.csv_timing + "?t=" + timestamp;
-      csvLink_throughput.href = body.csv_throughput + "?t=" + timestamp;
       pngLink.href = body.png_timing + "?t=" + timestamp;
-      pngLink_throughput.href = body.png_throughput + "?t=" + timestamp;
       downloadingsContainer.classList.remove("hidden");
-      downloadingsContainer_throughput.classList.remove("hidden");
     } else {
       downloadingsContainer.classList.add("hidden");
-      downloadingsContainer_throughput.classList.add("hidden");
     }
+    if (body.csv_throughput) {
+      pngLink_throughput.href = body.png_throughput + "?t=" + timestamp;
+      csvLink_throughput.href = body.csv_throughput + "?t=" + timestamp;
+      downloadingsContainer_throughput.classList.remove("hidden");
+    }
+
     // Après avoir récupéré `url` du serveur
-    const timestamp = Date.now();
+
     resultImage.src = body.png_timing + "?t=" + timestamp;
     resultImage_throughput.src = body.png_throughput + "?t=" + timestamp;
     resultImage.classList.remove("hidden");
-    resultImage_throughput.classList.remove("hidden");
+    if (body.isBarsNulls) {
+      toast.innerHTML =
+        "Le débit n'a pas pu être calculé pour cette requête(essayer une insertion)";
+      toast.classList.remove("hidden");
+      downloadingsContainer_throughput.classList.add("hidden");
+    } else {
+      toast.classList.add("hidden");
+      resultImage_throughput.classList.remove("hidden");
+      if (body.ignored == "OLAP") {
+        toast.innerHTML =
+          "Le débit de OLAP est ignoré car il n'existe pas de données pour les requêtes OLAP";
+        toast.classList.remove("hidden");
+      } else {
+        toast.innerHTML =
+          "Le débit de OLTP est ignoré car il n'existe pas de données pour les requêtes OLTP";
+        toast.classList.remove("hidden");
+      }
+    }
   } catch (err) {
     console.error(err);
     setStatus("Erreur: " + (err.message || err));

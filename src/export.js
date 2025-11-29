@@ -19,7 +19,7 @@ const PUBLIC_DIR = path.join(__dirname, "..", "public", "bin");
 if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
 
 /**
- * @param {Array} results - tableau de {pg:{durationMs}, monet:{durationMs}}
+ * @param {Array} results - tableau de {pg:{durationMs,throughput}, monet:{durationMs,throughput}}
  * @param {type:"OLTP" | "OLAP", jump:number} param -
  */
 export const exportCumulativeGraphData_graphTiming = (
@@ -50,16 +50,15 @@ export const exportCumulativeGraphData_graphTiming = (
   return outPath;
 };
 /**
- * @param {Array} results - tableau de {pg:{durationMs}, monet:{durationMs}}
- * @param {type:"OLTP" | "OLAP" } param
+ * @param {Array} results - tableau de {pg:{durationMs,throughput}, monet:{durationMs,throughput}}
+ * @param {type:"OLTP" | "OLAP" } params
+ * @return {path: string, isNull: boolean} path du fichier créé, isNull si toutes les valeur sont nulls
  */
 export const exportCumulativeGraphData_graphThroughput = (
   results,
   params,
   fileName
 ) => {
-  console.log("result ", results);
-
   const csvLines = ["label,PostgreSQL,MonetDB"];
   let pg_count_olap = 0;
   let pg_sum_olap = 0;
@@ -70,39 +69,55 @@ export const exportCumulativeGraphData_graphThroughput = (
   let monetdb_count_oltp = 0;
   let monetdb_sum_oltp = 0;
   results.map((r) => {
-    if (r.pg.throughput) {
-      pg_count_olap++;
-      pg_sum_olap += r.pg.throughput;
-    }
-    if (r.monetdb.throughput) {
-      monetdb_count_olap++;
-      monetdb_sum_olap += r.monetdb.throughput;
+    if (r.q.type == "OLAP") {
+      if (r.pg.throughput) {
+        pg_count_olap++;
+        pg_sum_olap += r.pg.throughput;
+      }
+      if (r.monetdb.throughput) {
+        monetdb_count_olap++;
+        monetdb_sum_olap += r.monetdb.throughput;
+      }
     }
 
-    if (r.pg.throughput) {
-      pg_count_oltp++;
-      pg_sum_oltp += r.pg.throughput;
-    }
-    if (r.monetdb.throughput) {
-      monetdb_count_oltp++;
-      monetdb_sum_oltp += r.monetdb.throughput;
+    if (r.q.type == "OLTP") {
+      if (r.pg.throughput) {
+        pg_count_oltp++;
+        pg_sum_oltp += r.pg.throughput;
+      }
+      if (r.monetdb.throughput) {
+        monetdb_count_oltp++;
+        monetdb_sum_oltp += r.monetdb.throughput;
+      }
     }
   });
-  csvLines.push(
-    `OLAP, ${Number((pg_sum_olap / pg_count_olap).toFixed(3))}, ${Number(
-      (monetdb_sum_olap / monetdb_count_olap).toFixed(3)
-    )}`
-  );
+  let ignoreOlap = true;
+  let ignoreOltp = true;
+  if (!(pg_count_olap == 0 || monetdb_count_olap == 0)) {
+    ignoreOlap = false;
+    csvLines.push(
+      `OLAP, ${Number((pg_sum_olap / pg_count_olap).toFixed(3))}, ${Number(
+        (monetdb_sum_olap / monetdb_count_olap).toFixed(3)
+      )}`
+    );
+  }
+  if (!(pg_count_oltp == 0 || monetdb_count_oltp == 0)) {
+    ignoreOltp = false;
+    csvLines.push(
+      `OLTP, ${Number((pg_sum_oltp / pg_count_oltp).toFixed(3))}, ${Number(
+        (monetdb_sum_oltp / monetdb_count_oltp).toFixed(3)
+      )}`
+    );
+  }
 
-  csvLines.push(
-    `OLTP, ${Number((pg_sum_oltp / pg_count_oltp).toFixed(3))}, ${Number(
-      (monetdb_sum_oltp / monetdb_count_oltp).toFixed(3)
-    )}`
-  );
   const outPath = path.join(PUBLIC_DIR, fileName);
   fs.writeFileSync(outPath, csvLines.join("\n"));
   console.log(`Cumulative CSV_throughput saved at ${outPath}`);
-  return outPath;
+  return {
+    path: outPath,
+    isNull: ignoreOlap && ignoreOltp,
+    ignored: ignoreOlap ? "OLAP" : "OLTP",
+  };
 };
 
 /**

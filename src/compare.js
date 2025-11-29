@@ -16,7 +16,6 @@ async function runQueryPostgre(pool, sql, params = []) {
   result.durationMs = Number(end - start) / 1e6;
   const rowCount =
     raw.rowCount || raw.affectedRows || raw.rowCnt || raw.rows.length;
-  // console.log("row count pg", rowCount);
 
   if (
     result.durationMs &&
@@ -25,7 +24,6 @@ async function runQueryPostgre(pool, sql, params = []) {
     rowCount != 0
   ) {
     result.throughput = Number((rowCount / result.durationMs).toFixed(3));
-    // console.log("throughput pg", result.throughput);
   } else {
     result.throughput = 0;
   }
@@ -50,7 +48,6 @@ async function runQueryMonetdb(conn, sql) {
   const end = process.hrtime.bigint();
   result.durationMs = Number(end - start) / 1e6;
   const rowCount = raw.affectedRows || raw.rowCnt || raw.data.length;
-  // console.log("row count mn", rowCount);
 
   if (
     result.durationMs &&
@@ -59,7 +56,6 @@ async function runQueryMonetdb(conn, sql) {
     rowCount != 0
   ) {
     result.throughput = Number((rowCount / result.durationMs).toFixed(3));
-    // console.log("throughput mn", result.throughput);
   } else {
     result.throughput = 0;
   }
