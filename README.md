@@ -22,19 +22,23 @@ lancer "npm i"
 lancer "npm run start"
 ouvrir "http://localhost:3000/" avec un navigateur
 
-faire un test en cliquant sur une des deux options de "Traitement pertinants ""
+Faire un test en cliquant sur une des deux options de "Traitement pertinants ""
 
 # si vous voulez lancer le projet avec docker(sans node requis)
 
-docker du benchmark:
-se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
+Docker du benchmark:
+Se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
 "
 docker build -t benchmark-image .
 docker run --name benchmark-container -p 3000:3000 benchmark-image
 "
 
-verifier leur lancement en lançant : docker ps
-vous devez voir benchmark dans la list
+Verifier le lancement en :
 
-pour arreter le container:
+-ouvrant "http://localhost:3000/" avec un navigateur
+
+- lançant : docker ps
+  vous devez voir benchmark dans la list
+
+Pour arreter le container:
 docker stop benchmark-container
