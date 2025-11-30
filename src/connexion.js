@@ -3,7 +3,7 @@ import { Connection } from "monetdb"; // Version 2.x
 import { Pool } from "pg";
 import net from "net";
 // Vérifie si un port est ouvert
-function checkPort(host, port, timeout = 1000) {
+async function checkPort(host, port, timeout = 1000) {
   return new Promise((resolve) => {
     const sock = new net.Socket();
     let done = false;
@@ -31,21 +31,26 @@ function checkPort(host, port, timeout = 1000) {
   });
 }
 
-// Vérifie si les services écoutent
+/**
+ * @ensure les deux sgbd sont connectés
+ * @return {ok:boolean, notConnected:string}
+ */
 export const checkConnections = async () => {
   const targets = [config.postgreConf, config.monetdbConf];
-  let bothConnected = true;
+  let ok = true;
+  let notConnected = "";
   for (const t of targets) {
     const r = await checkPort(t.host, t.port, 800);
-    if (!r.ok) bothConnected = false;
-    console.log(
-      `${t.sgbd} (${t.host}:${t.port}) -> ${
-        r.ok ? "LISTENING" : "NOT LISTENING"
-      }${r.reason ? " — " + r.reason : ""}`
-    );
+
+    if (!r.ok) {
+      ok = false;
+      notConnected += `-${t.sgbd.toUpperCase()} not listening to port ${
+        t.port
+      }, run it on the indicated port or change the port in config.js to the current server. \n`;
+    }
   }
 
-  return bothConnected;
+  return { ok, notConnected };
 };
 
 /**

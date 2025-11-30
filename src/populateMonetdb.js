@@ -6,8 +6,6 @@ import { getConnexion } from "./connexion.js";
  * Create tables in MonetDB
  */
 async function createTablesMonet(conn) {
-  console.log("before monet tables creation");
-
   await conn.execute(`
     DROP TABLE IF EXISTS orders;
     DROP TABLE IF EXISTS clients;
@@ -26,7 +24,6 @@ async function createTablesMonet(conn) {
       amount NUMERIC(15,2)
     );
   `);
-  console.log("MonetDB: clients and orders tables created.");
 }
 
 /**

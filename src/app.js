@@ -17,18 +17,18 @@ import { getResultsArray } from "./compare.js";
  * verification des bases de données et creation de celle de postgre seulement !!!!
  * creation des tables
  * population des tables
+ * @return {ok: boolean, message: string}
  */
 export const firstSetUp = async () => {
+  let message = "";
   try {
-    console.log("\n____CHECK CONNECTIONS_____");
-    const bothConnected = await checkConnections();
-    if (!bothConnected) {
-      console.error(
-        "Un ou les deux sgbd ne sont pas connecté (démarrez les serveur et assurez vous de la conformité des ports)"
-      );
-      return;
+    const connexion = await checkConnections();
+
+    if (!connexion.ok) {
+      return { ok: false, message: connexion.notConnected };
+    } else {
+      message += "Les deux sgbd sont bien connectés.\n";
     }
-    console.log("\n_____POSTGRE: CREATE BD,TABLES,POPULATING_____");
     const data = getData(
       config.insertDefaults.nClients,
       config.insertDefaults.nOrders
@@ -40,11 +40,11 @@ export const firstSetUp = async () => {
       config.insertDefaults.batchSize
     );
     if (populatePostgreResult.ok) {
-      console.log(populatePostgreResult.message);
+      message += "L'initialisation de PostgreSQL a réussi.\n";
     } else {
       console.error("Error: " + populatePostgreResult.message);
+      return { ok: false, message: populatePostgreResult.message };
     }
-    console.log("\n____MONETDB: CREATE TABLES,POPULATING_____");
 
     const populateMonetResult = await populateMonet(
       data.clients,
@@ -52,11 +52,11 @@ export const firstSetUp = async () => {
       config.insertDefaults.batchSize
     );
     if (populateMonetResult.ok) {
-      console.log(populateMonetResult.message);
+      message += "L'initialisation de MonetDB a réussi.\n";
     } else {
-      console.error("Error: " + populateMonetResult.message);
+      return { ok: false, message: populateMonetResult.message };
     }
-    return { ok: true, message: "setup réussi" };
+    return { ok: true, message };
   } catch (err) {
     console.error("Erreur :", err);
     return { ok: false, message: err };
@@ -80,13 +80,12 @@ export const firstSetUp = async () => {
 export const traiter = async (params) => {
   try {
     console.log("\n____PERFORMING QUERIES_____");
-    console.log("processing queries...");
+    console.log("Processing queries...");
     const res = await getResultsArray(
       params.queries,
       params.nbrStart,
       params.nbrEnd
     );
-    // console.log(res);
 
     console.log("creating csv file...");
     const csv_timing_fileName = "result_timing.csv";
@@ -128,7 +127,6 @@ export const traiter = async (params) => {
       csv_throughput:
         config.server.local_url + "/bin/" + csv_throughput_fileName,
     };
-    console.log(response);
 
     return response;
   } catch (err) {

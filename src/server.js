@@ -23,9 +23,12 @@ app.get("/", async (req, res) => {
 
 // Route simple
 app.get("/setup", async (req, res) => {
-  console.log("setup route");
-
   const setup = await firstSetUp();
+
+  if (!setup.ok) {
+    res.status(500).send(setup);
+    return;
+  }
   res.send(setup);
 });
 app.post("/traiter", async (req, res) => {
@@ -38,6 +41,8 @@ const PORT = 3000;
 
 // Démarrer le serveur
 app.listen(PORT, async () => {
-  await firstSetUp();
+  const { message } = await firstSetUp();
+  console.log(message);
+
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

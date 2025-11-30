@@ -5,10 +5,10 @@ function setup() {
     .then((response) => response.json())
     .then((data) => {
       if (data.ok) {
-        console.log("setup reussi");
+        console.log(data.message);
       } else {
-        alert("setup failed");
-        console.log("setup failed");
+        alert(data.message);
+        console.log(data.message);
       }
     })
     .catch((error) => {
