@@ -26,6 +26,8 @@ Faire un test en cliquant sur une des deux options de "Traitement pertinants ""
 
 # si vous voulez lancer le projet avec docker(sans node requis)
 
+mettre APP_DOCKERIZED à true
+
 Docker du benchmark:
 Se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
 "
