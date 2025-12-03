@@ -197,11 +197,13 @@ export const createGraphFromCSV_graphTiming = async (
 /**
  * @param {string} csvFile - chemin vers le fichier CSV
  * @param {string} outputFileName - nom du fichier de sortie
+ * @param {string} queryMajorType - "OLTP" ou "OLAP"
  * @return créer un graphique à partir du fichier CSV et le sauvegarde dans le dossier public/bin
  */
 export const createBarChartFromCSV_throughput = async (
   csvPath,
-  outputFileName
+  outputFileName,
+  queryMajorType = ""
 ) => {
   // stockage temporaire des données
   const labels = [];

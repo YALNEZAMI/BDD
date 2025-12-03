@@ -111,7 +111,8 @@ export const traiter = async (params) => {
     );
     const fileName_throughput = await createBarChartFromCSV_throughput(
       CSV_graphThroughput.path,
-      png_throughput_fileName
+      png_throughput_fileName,
+      getMajorType(params.queries)
     );
 
     const response = {
