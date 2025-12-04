@@ -387,7 +387,7 @@ runBtn.addEventListener("click", async () => {
 
   const nbrStart = Number(nbrStartEl.value) || 1;
   const jump = Number(jumpEl.value) || 1;
-  const nbrEnd = Number(nbrEndEl.value) + jump || 3;
+  const nbrEnd = Number(nbrEndEl.value) || 3;
   if (nbrStart > nbrEnd - 2) {
     alert("L'intervalle entre fin et debut doit être au moins 2.");
     return;
@@ -492,11 +492,12 @@ runBtn.addEventListener("click", async () => {
     } else {
       toast.classList.add("hidden");
       resultImage_throughput.classList.remove("hidden");
+
       if (body.ignored == "OLAP") {
         toast.innerHTML =
           "Le débit de OLAP est ignoré car il n'existe pas de données pour les requêtes OLAP";
         toast.classList.remove("hidden");
-      } else {
+      } else if (body.ignored == "OLTP") {
         toast.innerHTML =
           "Le débit de OLTP est ignoré car il n'existe pas de données pour les requêtes OLTP";
         toast.classList.remove("hidden");
@@ -530,7 +531,7 @@ async function runRemarkableValues(type) {
     type.toUpperCase() == "OLTP"
       ? PRESET_QUERIES.find((q) => q.id == "oltp_heavy_update")
       : PRESET_QUERIES.find((q) => q.id == "olap_client_order_summary");
-  nbrStartEl.value = 400;
+  nbrStartEl.value = type.toUpperCase() == "OLTP" ? 500 : 1;
   nbrEndEl.value = type.toUpperCase() == "OLTP" ? 1500 : 600;
   jumpEl.value = 2;
   selected = [query];

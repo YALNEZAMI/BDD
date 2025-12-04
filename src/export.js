@@ -21,6 +21,7 @@ if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
 /**
  * @param {Array} results - tableau de {pg:{durationMs,throughput}, monet:{durationMs,throughput}}
  * @param {type:"OLTP" | "OLAP", jump:number} param -
+ * @return path:string le chemin vers le fichier csv crée
  */
 export const exportCumulativeGraphData_graphTiming = (
   results,
@@ -52,11 +53,11 @@ export const exportCumulativeGraphData_graphTiming = (
 /**
  * @param {Array} results - tableau de {pg:{durationMs,throughput}, monet:{durationMs,throughput}}
  * @param {type:"OLTP" | "OLAP" } params
- * @return {path: string, isNull: boolean} path du fichier créé, isNull si toutes les valeur sont nulls
+ * @return {path: string, isNull: boolean, ignored:"None" | "OLAP" | "OLTP"} path du fichier créé, isNull si toutes les valeur sont nulls,
+ *  ignored le type de requete qui n'a pas de donnée permettant de faire les bars(interessant si un seul type est supporté)
  */
 export const exportCumulativeGraphData_graphThroughput = (
   results,
-  params,
   fileName
 ) => {
   const csvLines = ["label,PostgreSQL,MonetDB"];
@@ -109,6 +110,12 @@ export const exportCumulativeGraphData_graphThroughput = (
       )}`
     );
   }
+  let ignored = "None";
+  if (ignoreOlap) {
+    ignored = "OLAP";
+  } else if (ignoreOltp) {
+    ignored = "OLTP";
+  }
 
   const outPath = path.join(PUBLIC_DIR, fileName);
   fs.writeFileSync(outPath, csvLines.join("\n"));
@@ -116,7 +123,7 @@ export const exportCumulativeGraphData_graphThroughput = (
   return {
     path: outPath,
     isNull: ignoreOlap && ignoreOltp,
-    ignored: ignoreOlap ? "OLAP" : "OLTP",
+    ignored,
   };
 };
 
@@ -129,7 +136,7 @@ export const exportCumulativeGraphData_graphThroughput = (
 export const createGraphFromCSV_graphTiming = async (
   csvFile,
   outputFileName,
-  queryMajorType
+  queryMajorType = "OLTP"
 ) => {
   const content = fs.readFileSync(csvFile);
   const records = parse(content, { columns: true });
@@ -203,7 +210,7 @@ export const createGraphFromCSV_graphTiming = async (
 export const createBarChartFromCSV_throughput = async (
   csvPath,
   outputFileName,
-  queryMajorType = ""
+  queryMajorType = "OLTP"
 ) => {
   // stockage temporaire des données
   const labels = [];
