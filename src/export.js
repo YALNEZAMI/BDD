@@ -341,15 +341,15 @@ export const createBarChartFromCSV_throughput = async (
         {
           label: "MonetDB",
           data: monetdb_values,
-          backgroundColor: "rgba(30, 144, 255, 0.9)", // blue
-          borderColor: "rgba(30, 144, 255, 1)",
+          backgroundColor: "rgba(220, 20, 60, 0.9)", // red
+          borderColor: "rgba(220, 20, 60, 1)",
           borderWidth: 1,
         },
         {
           label: "PostgreSQL",
           data: pg_values,
-          backgroundColor: "rgba(220, 20, 60, 0.9)", // red
-          borderColor: "rgba(220, 20, 60, 1)",
+          backgroundColor: "rgba(30, 144, 255, 0.9)", // blue
+          borderColor: "rgba(30, 144, 255, 1)",
           borderWidth: 1,
         },
       ],
