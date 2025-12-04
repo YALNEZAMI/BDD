@@ -30,10 +30,10 @@ mettre APP_DOCKERIZED à true
 
 Docker du benchmark:
 Se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
-"
-docker build -t benchmark-image .
-docker run --name benchmark-container -p 3000:3000 benchmark-image
-"
+"docker build -t benchmark-image ."
+puis
+"docker run --name benchmark-container -p 3000:3000 benchmark-image"
+Si un container a déjà le nom " benchmark-container " alors il faudra le supprimer ou renommer dans la commande docker
 
 Verifier le lancement en :
 
