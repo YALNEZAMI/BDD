@@ -7,7 +7,7 @@ Comparaison entre les performance des deux SGBDs MonetDB et PostgreSQL en foncti
 avoir nodejs et npm d'installé(sinon partie docker à la fin)
 
 verifier que le serveur postgres est démarré sur le port 5432
-verifier que le serveur monetdb est démarré sur le port 50000
+verifier que le serveur monetdb est démarré sur le port 50000 (sinon aller à C://programmes/Monetdb/ et lancer m5server.bat )
 
 une bd de créée à mettre dans config de monetdb(pas de creation automatique si db n'exist pas)
 
