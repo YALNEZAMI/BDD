@@ -10,3 +10,87 @@ MonetDB surpasse PostgreSQL pour les scans/agrégations → les colonnes contigu
 
 
 PB: monetdb driver doesn't support "EXPLAIN sqlQuery" nor "EXPLAIN ANALYZE sqlQuery"
+
+_config.js
+
+expose des variables d'environnement, lié à:
+-L'application même
+-La connexion aux deux sgbds
+-L'initialisation des sgbds (comme le nombre de lignes à inserer)
+
+_connexion.js
+Exposant:
+. checkConnections() qui vérifie si les deux sgbds écoutent bien aux ports indiqués dans config.js
+. getConnexion(config) qui prend une des deux configuration des deux sgbds et retourne un driver unifié avec l'interface (connect(),execute(),close())
+
+_generateData.js
+Exposant la fonction getData qui retourne deux tableau, un pour les clients et un pour les commandes(orders)
+la taille de ces deux tableau est à paramétrer dans config.js
+
+_populateMonetdb.js
+Exposant populateMonet(clients,orders,batchSize) qui prend les tableaux de clients et orders généré par getData() de generateData.js, ainsi qu'un batchSize qui précise l'interval des commits
+on vérifie l'existance de la base de donnée monterDb(non créable programmatiquement)
+on supprime et recrée les deux tables clients et orders
+on commence à peupler
+
+_populatePostgre.js
+Exposant populatePostgre(clients,orders,batchSize) qui prend les tableaux de clients et orders généré par getData() de generateData.js, ainsi qu'un batchSize qui précise l'interval des commits
+on vérifie l'existance de la base de donnée sinon on la crée
+on supprime et recrée les deux tables clients et orders
+on commence à peupler
+
+
+_app.js:
+
+Expose deux fonctions:
+
+-setup(): qui initialise l'environnement des deux sgbds
+ après avoir verifier que les 2 sgbds écoutent bien au ports ports grace à checkConnections() de connexion.js
+-traiter(params): qui éxecute un ensemble de requêtes et fait les calculs de métrique ainsi que leurs illustrations
+
+_compare.js
+
+Expose getResultsArray(queries,nbrExecution)
+qui prend un ensemble de requete et un nombre d'éxecutions et traite chaque requete nbrExecution fois
+et retourne un tableau contenant des metrique(temps d'execution et débit) pour chaque requete
+
+_export.js
+
+Exposant:
+. exportCumulativeGraphData_graphTiming(results,params,fileName)
+results vient de getResultsArray(queries,nbrExecution) de compare.js
+params contient des parametres venant de l'interface web relatifs à l'échantionnage et l'affichage comme nbrStart(début d'affichage), nbrEnd(Fin affichage) et jump (espacement)
+fileName le nom de fichier csv à créer dans /public/bin/fileName_timing.csv
+retourne le chemin vers le fichier csv crée, ce fichier aura 3 champs NumExecutedQueries,PostgreSQL,MonetDB
+et autant de lignes que (nbrEnd-nbrStart / jump) et donc on va cumuler les résultat en fonction du nombre de requêtes
+
+. exportCumulativeGraphData_graphThroughput(results,fileName)
+results vient de getResultsArray(queries,nbrExecution) de compare.js
+fileName le nom de fichier csv à créer dans /public/bin/fileName_debit.csv
+retourne un objet {path: string, isNull: boolean, ignored : "None" | "OLTP" | "OLAP" } 
+avec path le chemin vers le fichier csv crée et boolean si les type de requêtes ne sont pas supportés
+ignored si un seul type de requêtes n'est supporté.
+le fichier aura la forme:
+label,PostgreSQL,MonetDB
+OLAP, 30.49, 38.342
+OLTP, 30.49, 38.342
+avec maximum les 3 lignes ci-dessus ou just les noms des champs (donc isNull = true) si un seul sgbd est ignoré il est alors dans ignored
+
+
+. createGraphFromCSV_graphTiming(csvFile,outputFileName,queryMajorType)
+csvFile le chemin du fichier csv généré par exportCumulativeGraphData_graphTiming à partir du quel créer le graph à courbes
+outputFileName le nom du fichier qui sera crée dans public/bin/outputFileName_graph.png
+queryMajorType le type majoritaire dans l'ensemble de requêtes passé à getResultsArray() de compare.js
+retourne le chemin vers le fichier créé, ce fichier contient un graph à courbes représentant sur l'axe des abscisses le nombre de requêtes et le temps d'exécution sur l'axe des ordonnées
+la courbe bleu représente le sgbd PostgreSQL et la rouge MonetDB
+
+. createGraphFromCSV_graphTiming(csvFile,outputFileName,queryMajorType)
+csvFile le chemin du fichier csv généré par exportCumulativeGraphData_graphThroughput à partir du quel créer le graph à bars
+outputFileName le nom du fichier qui sera crée dans public/bin/outputFileName_throughput_graph.png
+queryMajorType le type majoritaire dans l'ensemble de requêtes passé à getResultsArray() de compare.js
+retourne le chemin vers le fichier créé, ce fichier contient un graph à bars représentant sur l'axe des ordonnées le débit (nbr de lignes affechté/temps d'execution)
+si les deux type de requete, aboutissent à un résultat, alors on aura 4 bars 
+deux bleu pour PostgreSQL, une pour les requêtes de type OLAP et une autre pour OLTP
+deux rouge pour MonetDB, une pour les requêtes de type OLAP et une autre pour OLTP
+si un seul type de requete aboutit alors deux bars, une bleu PostgreSQL et une rouge MonetDB
+
