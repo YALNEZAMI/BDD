@@ -1,8 +1,9 @@
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { firstSetUp, traiter } from "./app.js";
+import { setUp, traiter } from "./app.js";
 import "dotenv/config"; // ceci charge automatiquement le .env
+import { config } from "./config.js";
 
 const app = express();
 
@@ -23,7 +24,7 @@ app.get("/", async (req, res) => {
 
 // Route simple
 app.get("/setup", async (req, res) => {
-  const setup = await firstSetUp();
+  const setup = await setUp();
 
   if (!setup.ok) {
     res.status(500).send(setup);
@@ -37,12 +38,13 @@ app.post("/traiter", async (req, res) => {
 });
 
 // Choisir un port
-const PORT = 3000;
+const PORT = config.server.port;
 
 // Démarrer le serveur
 app.listen(PORT, async () => {
-  const { message } = await firstSetUp();
+  const { message } = await setUp();
   console.log(message);
-
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(
+    `🚀 Server running on ${config.server.protocol}://${config.server.host}:${PORT}`
+  );
 });

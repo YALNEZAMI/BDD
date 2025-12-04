@@ -111,7 +111,7 @@ async function fillOrdersPostgres(pool, orders = [], batchSize = 200) {
 export const populatePostgre = async (
   clients = [],
   orders = [],
-  batchSize = config.insertDefaults.batchSize
+  batchSize = conf.insertDefaults.batchSize
 ) => {
   if (!conf) return { ok: false, message: "Postgres: no config found." };
 

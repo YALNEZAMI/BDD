@@ -69,11 +69,7 @@ async function runQueryMonetdb(conn, sql) {
  * @param {number} nbrExecution Nombre de fois à exécuter chaque requête
  * @return {Array<{q: {id:string ,label:string, sql:string, type:string}, pg: {engine:string, durationMs:number}, monet: {engine:string, durationMs:number}}}
  */
-export const getResultsArray = async (
-  queries,
-  nbrExecutionMin = 0,
-  nbrExecution = 2
-) => {
+export const getResultsArray = async (queries, nbrExecution) => {
   const pool = getConnexion(config.postgreConf);
 
   const conn = getConnexion(config.monetdbConf);
@@ -82,9 +78,10 @@ export const getResultsArray = async (
   await conn.connect();
 
   const results = [];
+  console.log(queries.length * nbrExecution);
 
   for (const q of queries) {
-    for (let i = nbrExecutionMin; i < nbrExecution; i++) {
+    for (let i = 0; i < nbrExecution; i++) {
       // Parallélisme inter-SGBD seulement
       const [pgRes, monetRes] = await Promise.all([
         runQueryPostgre(pool, q.sql), // 1 seule requête PG à la fois

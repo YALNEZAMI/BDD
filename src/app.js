@@ -19,7 +19,7 @@ import { getResultsArray } from "./compare.js";
  * population des tables
  * @return {ok: boolean, message: string}
  */
-export const firstSetUp = async () => {
+export const setUp = async () => {
   let message = "";
   try {
     const connexion = await checkConnections();
@@ -81,11 +81,7 @@ export const traiter = async (params) => {
   try {
     console.log("\n____PERFORMING QUERIES_____");
     console.log("Processing queries...");
-    const res = await getResultsArray(
-      params.queries,
-      params.nbrStart,
-      params.nbrEnd
-    );
+    const res = await getResultsArray(params.queries, params.nbrEnd);
 
     console.log("creating csv file...");
     const csv_timing_fileName = "result_timing.csv";
@@ -99,7 +95,6 @@ export const traiter = async (params) => {
     );
     const CSV_graphThroughput = exportCumulativeGraphData_graphThroughput(
       res,
-      params,
       csv_throughput_fileName
     );
 
