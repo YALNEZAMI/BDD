@@ -1,63 +1,77 @@
 import { config } from "./config.js";
 import { getConnexion } from "./connexion.js";
 /**
- * Exécute une requête sur PostgreSQL et retourne métriques enrichies.
+ *
+ * @param {*} pool
+ * @param {Array <{id:string ,label:string, sql:string, type:string}>} queries
+ * @param {*} nbrExecution
+ * @returns {Array <{
+ * query: {id:string ,label:string, sql:string, type:string},
+ * durationMs: number,
+ * throughput: number,
+ * }}
  */
-async function runQueryPostgre(pool, sql, params = []) {
-  const start = process.hrtime.bigint();
-  const result = {
-    engine: "postgres",
-    durationMs: 0,
-  };
+async function runQueryPostgre(pool, queries, nbrExecution) {
+  const result = [];
+  for (let i = 0; i < nbrExecution; i++) {
+    for (const query of queries) {
+      const start = process.hrtime.bigint();
 
-  const raw = await pool.execute(sql, params);
+      const raw = await pool.execute(query.sql);
 
-  const end = process.hrtime.bigint();
-  result.durationMs = Number(end - start) / 1e6;
-  const rowCount =
-    raw.rowCount || raw.affectedRows || raw.rowCnt || raw.rows.length;
-
-  if (
-    result.durationMs &&
-    rowCount &&
-    result.durationMs != 0 &&
-    rowCount != 0
-  ) {
-    result.throughput = Number((rowCount / result.durationMs).toFixed(3));
-  } else {
-    result.throughput = 0;
+      const end = process.hrtime.bigint();
+      const durationMs = Number(end - start) / 1e6;
+      const rowCount =
+        raw.rowCount || raw.affectedRows || raw.rowCnt || raw.rows.length;
+      let throughput = 0;
+      if (durationMs && rowCount && durationMs != 0 && rowCount != 0) {
+        throughput = Number((rowCount / durationMs).toFixed(3));
+      }
+      result.push({
+        query,
+        durationMs,
+        throughput,
+      });
+    }
   }
 
   return result;
 }
 
 /**
- * Exécute une requête sur MonetDB et retourne métriques enrichies.
+ *
+ * @param {*} pool
+ * @param {Array <{id:string ,label:string, sql:string, type:string}>} queries
+ * @param {*} nbrExecution
+ * @returns {Array <{
+ * query: {id:string ,label:string, sql:string, type:string},
+ * durationMs: number,
+ * throughput: number
+ * }}
  */
-async function runQueryMonetdb(conn, sql) {
-  const start = process.hrtime.bigint();
-  const result = {
-    engine: "monetdb",
-    durationMs: 0,
-  };
+async function runQueryMonetdb(conn, queries, nbrExecution) {
+  const result = [];
+  for (let i = 0; i < nbrExecution; i++) {
+    for (const query of queries) {
+      const start = process.hrtime.bigint();
 
-  // Exécution principale
+      // Exécution principale
 
-  const raw = await conn.execute(sql);
+      const raw = await conn.execute(query.sql);
 
-  const end = process.hrtime.bigint();
-  result.durationMs = Number(end - start) / 1e6;
-  const rowCount = raw.affectedRows || raw.rowCnt || raw.data.length;
-
-  if (
-    result.durationMs &&
-    rowCount &&
-    result.durationMs != 0 &&
-    rowCount != 0
-  ) {
-    result.throughput = Number((rowCount / result.durationMs).toFixed(3));
-  } else {
-    result.throughput = 0;
+      const end = process.hrtime.bigint();
+      const durationMs = Number(end - start) / 1e6;
+      const rowCount = raw.affectedRows || raw.rowCnt || raw.data.length;
+      let throughput = 0;
+      if (durationMs && rowCount && durationMs != 0 && rowCount != 0) {
+        throughput = Number((rowCount / durationMs).toFixed(3));
+      }
+      result.push({
+        query,
+        durationMs,
+        throughput,
+      });
+    }
   }
 
   return result;
@@ -67,33 +81,43 @@ async function runQueryMonetdb(conn, sql) {
  * Exécute un tableau de requêtes plusieurs fois et retourne un tableau de résultats par exécution
  * @param {Array<{id:string ,label:string, sql:string, type:string}>} queries
  * @param {number} nbrExecution Nombre de fois à exécuter chaque requête
- * @return {Array<{q: {id:string ,label:string, sql:string, type:string}, pg: {engine:string, durationMs:number}, monet: {engine:string, durationMs:number}}}
+ * @return {Array<{
+ * query: {id:string ,label:string, sql:string, type:string},
+ * postgres: {engine:string, durationMs:number},
+ * monetdb: {engine:string, durationMs:number}}}
  */
 export const getResultsArray = async (queries, nbrExecution) => {
-  const pool = getConnexion(config.postgreConf);
+  const postgresDriver = getConnexion(config.postgreConf);
 
-  const conn = getConnexion(config.monetdbConf);
+  const monetdbDriver = getConnexion(config.monetdbConf);
 
-  await pool.connect();
-  await conn.connect();
+  await postgresDriver.connect();
+  await monetdbDriver.connect();
 
+  // Parallélisme inter-SGBD seulement
+  const [pgResults, monetResults] = await Promise.all([
+    runQueryPostgre(postgresDriver, queries, nbrExecution),
+    runQueryMonetdb(monetdbDriver, queries, nbrExecution),
+  ]);
+  //fusionner les résultats
   const results = [];
-  console.log(queries.length * nbrExecution);
-
-  for (const q of queries) {
-    for (let i = 0; i < nbrExecution; i++) {
-      // Parallélisme inter-SGBD seulement
-      const [pgRes, monetRes] = await Promise.all([
-        runQueryPostgre(pool, q.sql), // 1 seule requête PG à la fois
-        runQueryMonetdb(conn, q.sql), // peut s'exécuter en parallèle
-      ]);
-
-      results.push({ q, pg: pgRes, monetdb: monetRes });
-    }
+  for (let i = 0; i < pgResults.length; i++) {
+    results.push({
+      query: pgResults[i].query,
+      postgres: {
+        engine: "postgres",
+        durationMs: pgResults[i].durationMs,
+        throughput: pgResults[i].throughput,
+      },
+      monetdb: {
+        engine: "monetdb",
+        durationMs: monetResults[i].durationMs,
+        throughput: monetResults[i].throughput,
+      },
+    });
   }
 
-  await pool.close();
-  await conn.close();
-
+  postgresDriver.close();
+  monetdbDriver.close();
   return results;
 };

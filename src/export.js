@@ -19,7 +19,10 @@ const PUBLIC_DIR = path.join(__dirname, "..", "public", "bin");
 if (!fs.existsSync(PUBLIC_DIR)) fs.mkdirSync(PUBLIC_DIR, { recursive: true });
 
 /**
- * @param {Array} results - tableau de {pg:{durationMs,throughput}, monet:{durationMs,throughput}}
+ * @param {Array<{
+ * query: {id:string ,label:string, sql:string, type:string},
+ * postgres: {engine:string, durationMs:number},
+ * monetdb: {engine:string, durationMs:number}}} results
  * @param {type:"OLTP" | "OLAP", jump:number} param -
  * @return path:string le chemin vers le fichier csv crée
  */
@@ -37,7 +40,7 @@ export const exportCumulativeGraphData_graphTiming = (
   for (let count = params.nbrStart; count <= params.nbrEnd; count += jump) {
     if (resultIndex >= results.length) break;
     const r = results[resultIndex];
-    pgCum += r.pg.durationMs;
+    pgCum += r.postgres.durationMs;
     monetCum += r.monetdb.durationMs;
 
     csvLines.push(`${count},${pgCum.toFixed(2)},${monetCum.toFixed(2)}`);
@@ -51,7 +54,10 @@ export const exportCumulativeGraphData_graphTiming = (
   return outPath;
 };
 /**
- * @param {Array} results - tableau de {pg:{durationMs,throughput}, monet:{durationMs,throughput}}
+ * @param {Array<{
+ * query: {id:string ,label:string, sql:string, type:string},
+ * postgres: {engine:string, durationMs:number},
+ * monetdb: {engine:string, durationMs:number}}} results
  * @param {type:"OLTP" | "OLAP" } params
  * @return {path: string, isNull: boolean, ignored:"None" | "OLAP" | "OLTP"} path du fichier créé, isNull si toutes les valeur sont nulls,
  *  ignored le type de requete qui n'a pas de donnée permettant de faire les bars(interessant si un seul type est supporté)
@@ -70,10 +76,10 @@ export const exportCumulativeGraphData_graphThroughput = (
   let monetdb_count_oltp = 0;
   let monetdb_sum_oltp = 0;
   results.map((r) => {
-    if (r.q.type == "OLAP") {
-      if (r.pg.throughput) {
+    if (r.query.type == "OLAP") {
+      if (r.postgres.throughput) {
         pg_count_olap++;
-        pg_sum_olap += r.pg.throughput;
+        pg_sum_olap += r.postgres.throughput;
       }
       if (r.monetdb.throughput) {
         monetdb_count_olap++;
@@ -81,10 +87,10 @@ export const exportCumulativeGraphData_graphThroughput = (
       }
     }
 
-    if (r.q.type == "OLTP") {
-      if (r.pg.throughput) {
+    if (r.query.type == "OLTP") {
+      if (r.postgres.throughput) {
         pg_count_oltp++;
-        pg_sum_oltp += r.pg.throughput;
+        pg_sum_oltp += r.postgres.throughput;
       }
       if (r.monetdb.throughput) {
         monetdb_count_oltp++;
