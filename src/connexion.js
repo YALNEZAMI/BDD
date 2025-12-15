@@ -74,6 +74,11 @@ export const getConnexion = (conf) => {
     });
     return normalizeConnexion(conn, conf.sgbd);
   }
+  console.log(
+    "connexion.js - getConnexion - conf.sgbd doesn't fit any condition"
+  );
+
+  return null;
 };
 
 /**
