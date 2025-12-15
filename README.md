@@ -4,43 +4,50 @@ Comparaison entre les performance des deux SGBDs MonetDB et PostgreSQL en foncti
 
 # Prerequis:
 
-avoir nodejs et npm d'installé(sinon partie docker à la fin)
+avoir (nodejs et npm) ou (Docker)
 
 verifier que le serveur postgres est démarré sur le port 5432
 verifier que le serveur monetdb est démarré sur le port 50000 (sinon aller à C://programmes/Monetdb/ et lancer m5server.bat )
 
-une bd de créée à mettre dans config de monetdb(pas de creation automatique si db n'exist pas)
+# Configuration
 
-set username/passwords/bdname/ dans config.js
-mettre APP_DOCKERIZED à false sauf si utilisation de docker(true)
+Aller éditer le fichier /src/config.js en vérifiant pour chaque SGBD:
 
-# Demarrage
+- username
+- password
+- bdname
 
-aller à la racine du projet avec un terminal
+Vérifier l'existance d'une base de donnée Monetdb, appelée demo (ou changer selon votre db dans config.js )
 
-lancer "npm i"
-lancer "npm run start"
-ouvrir "http://localhost:3000/" avec un navigateur
+# Demarrage avec nodeJs
 
-Faire un test en cliquant sur une des deux options de "Traitement pertinants ""
+- Mettre APP_DOCKERIZED à false
 
-# si vous voulez lancer le projet avec docker(sans node requis)
+- aller à la racine du projet avec un terminal et lancer:
+  "npm i"
+  "npm run start"
 
-mettre APP_DOCKERIZED à true
+- ouvrir "http://localhost:3000/" avec un navigateur
 
-Docker du benchmark:
-Se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
-"docker build -t benchmark-image ."
-puis
-"docker run --name benchmark-container -p 3000:3000 benchmark-image"
-Si un container a déjà le nom " benchmark-container " alors il faudra le supprimer ou renommer dans la commande docker
+Faire un test en cliquant sur une des deux options de "Traitement pertinants"
+
+# Demmarage Docker
+
+- Mettre APP_DOCKERIZED à true
+
+- Se mettre à la racine du projet(au niveau de Dockerfile) et lancer:
+  "docker build -t benchmark-image . "
+  puis
+  "docker run --name benchmark-container -p 3000:3000 benchmark-image"
+
+Si un container/image a déjà le nom " benchmark-container/benchamrk-image" alors il faudra le supprimer ou renommer dans la commande docker
 
 Verifier le lancement en :
 
--ouvrant "http://localhost:3000/" avec un navigateur
+- ouvrant "http://localhost:3000/" avec un navigateur
+  Faire un test en cliquant sur une des deux options de "Traitement pertinants"
 
-- lançant : docker ps
-  vous devez voir benchmark dans la list
+# Arret du Docker
 
 Pour arreter le container:
 docker stop benchmark-container
