@@ -176,10 +176,16 @@ export const createGraphFromCSV_graphTiming = async (
       plugins: {
         title: {
           display: true,
+          align: "center",
           text:
-            "PostgreSQL vs MonetDB: délais de traitement pour requêtes " +
+            "Délais en fonction du nombre de requêtes à majorité " +
             queryMajorType,
-          font: { size: 20 },
+          color: "#000",
+          font: { size: 20, family: "Arial", weight: "bold" },
+          padding: {
+            top: 20,
+            bottom: 30,
+          },
         },
       },
       scales: {
@@ -374,10 +380,14 @@ export const createBarChartFromCSV_throughput = async (
         },
         title: {
           display: true,
-          text: `MonetDB vs PostgreSQL: débit nbr_lignes/temps(ms) pour requêtes ${queryMajorType}`,
+          align: "center",
+          text: `PostgreSQL vs MonetDB: Débit nbr_lignes_affectées/temps `,
           color: "#000",
           font: { size: 20, family: "Arial", weight: "bold" },
-          padding: { top: 10, bottom: 20 },
+          padding: {
+            top: 20,
+            bottom: 30,
+          },
         },
       },
       scales: {
@@ -392,7 +402,7 @@ export const createBarChartFromCSV_throughput = async (
         y: {
           title: {
             display: true,
-            text: `Débit row/time(ms)`,
+            text: `Débit: row/time(ms)`,
             color: "#000",
             font: { size: 20, family: "Arial", weight: "bold" },
             padding: { top: 10, bottom: 20 },
